@@ -34,8 +34,8 @@
  * author.
  */
 
-#ifndef UCUNIT_0100_H_
-#define UCUNIT_0100_H_
+#ifndef UCUNIT_0101_H_
+#define UCUNIT_0101_H_
 
 /*****************************************************************************/
 /****** Customizing area ******/
