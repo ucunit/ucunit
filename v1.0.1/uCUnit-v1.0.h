@@ -150,7 +150,7 @@
  * UCUNIT_MODE_VERBOSE: Passed and failed checks are displayed
  */
 //#define UCUNIT_MODE_NORMAL
-#define UCUNIT_MODE_VERBOSE
+//#define UCUNIT_MODE_VERBOSE
 
 /**
  * Max. number of checkpoints. This may depend on your application
