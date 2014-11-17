@@ -146,6 +146,7 @@ static void Specifications(void)
 
 void Testsuite_List(void)
 {
+  UCSPEC_UseStaticsAtLeastOnce();
   Specifications();
   UCSPEC_WriteSummary();
 }
@@ -153,7 +154,6 @@ void Testsuite_List(void)
 int main(void)
 {
     UCUNIT_Init();
-    UCSPEC_UseStaticsAtLeastOnce();
     UCUNIT_WriteString("\n**************************************\n\n");
     Testsuite_List();
     UCUNIT_Shutdown();
