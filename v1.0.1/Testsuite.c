@@ -34,6 +34,7 @@
  * author.
  */
 
+#define UCUNIT_MODE_VERBOSE
 #include "System.h"
 #include "uCUnit-v1.0.h"
 #include "Testsuite.h"
