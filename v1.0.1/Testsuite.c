@@ -182,16 +182,7 @@ void Testsuite_RunTests(void)
 int main(void)
 {
     UCUNIT_Init();
-    UCUNIT_WriteString("\n**************************************");
-    UCUNIT_WriteString("\nName:     ");
-    UCUNIT_WriteString("uCUnit demo application");
-    UCUNIT_WriteString("\nCompiled: ");
-    UCUNIT_WriteString(__DATE__);
-    UCUNIT_WriteString("\nTime:     ");
-    UCUNIT_WriteString(__TIME__);
-    UCUNIT_WriteString("\nVersion:  ");
-    UCUNIT_WriteString(UCUNIT_VERSION);
-    UCUNIT_WriteString("\n**************************************");
+    UCUNIT_TestBegin("uCUnit demo application");
     Testsuite_RunTests();
     UCUNIT_Shutdown();
 
