@@ -38,6 +38,8 @@
 #ifndef UCUNIT_0101_H_
 #define UCUNIT_0101_H_
 
+#include <System.h>
+
 /*****************************************************************************/
 /****** Customizing area ******/
 /*****************************************************************************/
@@ -151,8 +153,7 @@
  * UCUNIT_MODE_VERBOSE: Passed and failed checks are displayed
  * UCUNIT_MODE_JSON: Report is generated in json format
  */
-//#define UCUNIT_MODE_NORMAL
-#define UCUNIT_MODE_VERBOSE
+/* Mode is controlled via CMAKE option */
 
 /**
  * Max. number of checkpoints. This may depend on your application
@@ -168,7 +169,7 @@
 /* Some useful constants                                                     */
 /*****************************************************************************/
 
-#define UCUNIT_VERSION "v1.0" /* Version info */
+#define UCUNIT_VERSION "v1.1" /* Version info */
 
 #ifndef NULL
 #define NULL (void *)0
@@ -234,7 +235,15 @@ static int ucunit_index = 0; /* Tracepoint index */
  */
 #define UCUNIT_DefineToString(x)   UCUNIT_DefineToStringHelper(x)
 
-
+/**
+ * @Macro:       UCUNIT_DefineToString(x)
+ *
+ * @Description: Converts an argument list to a string
+ *
+ * @Param ...:   Argument list
+ *
+ */
+#define UCUNIT_ArgsToString(...) #__VA_ARGS__
 
 /**
  * @Macro:       UCUNIT_FailCheck(msg, args)
@@ -364,7 +373,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsEqual(expected,actual)         \
-    UCUNIT_Check( (expected) == (actual), "IsEqual", #expected "," #actual )
+    UCUNIT_Check( (expected) == (actual), "IsEqual", UCUNIT_ArgsToString(expected, actual) )
 
 /**
  * @Macro:       UCUNIT_CheckIsNull(pointer)
@@ -406,7 +415,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsInRange(value, lower, upper)   \
-    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", #value "," #lower "," #upper)
+    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", UCUNIT_ArgsToString(value, lower, upper)
 
 /**
  * @Macro:       UCUNIT_CheckIs8Bit(value)
@@ -462,7 +471,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsBitSet(value, bitno) \
-    UCUNIT_Check( (1==(((value)>>(bitno)) & 0x01) ), "IsBitSet", #value "," #bitno)
+    UCUNIT_Check( (1==(((value)>>(bitno)) & 0x01) ), "IsBitSet", UCUNIT_ArgsToString(value, bitno))
 
 /**
  * @Macro:       UCUNIT_CheckIsBitClear(value, bitno)
@@ -476,7 +485,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsBitClear(value, bitno) \
-    UCUNIT_Check( (0==(((value)>>(bitno)) & 0x01) ), "IsBitClear", #value "," #bitno)
+    UCUNIT_Check( (0==(((value)>>(bitno)) & 0x01) ), "IsBitClear", UCUNIT_ArgsToString(value, bitno))
 
 /*****************************************************************************/
 /* Support for code coverage */
