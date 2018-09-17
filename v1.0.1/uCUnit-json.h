@@ -77,9 +77,9 @@
       UCUNIT_WriteString(UCUNIT_DefineToString(__LINE__));    \
       UCUNIT_WriteString("\", \"result\":\"failed\",  \"msg\":\"");                        \
       UCUNIT_WriteString(msg);                                \
-      UCUNIT_WriteString("\", \"args\":\"");                                \
+      UCUNIT_WriteString("\", \"args\":");                                \
       UCUNIT_WriteString(UCUNIT_DefineToString(args));                               \
-      UCUNIT_WriteString("\"},\n");                              \
+      UCUNIT_WriteString("},\n");                              \
     } while(0)
 
 /**
