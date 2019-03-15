@@ -376,6 +376,20 @@ static int ucunit_index = 0; /* Tracepoint index */
     UCUNIT_Check( (expected) == (actual), "IsEqual", UCUNIT_ArgsToString(expected, actual) )
 
 /**
+ * @Macro:       UCUNIT_CheckIsNotEqual(unexpected,actual)
+ *
+ * @Description: Checks that the actual value is not equals with the unexpected value.
+ *
+ * @Param unexpected: Unexpected value.
+ * @Param actual: Actual value.
+ *
+ * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
+ *
+ */
+#define UCUNIT_CheckIsNotEqual(unexpected,actual)         \
+    UCUNIT_Check( (unexpected) != (actual), "IsNotEqual", UCUNIT_ArgsToString(unexpected, actual) )
+
+/**
  * @Macro:       UCUNIT_CheckIsNull(pointer)
  *
  * @Description: Checks that a pointer is NULL.
@@ -415,7 +429,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsInRange(value, lower, upper)   \
-    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", UCUNIT_ArgsToString(value, lower, upper)
+    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", UCUNIT_ArgsToString(value, lower, upper) )
 
 /**
  * @Macro:       UCUNIT_CheckIs8Bit(value)
