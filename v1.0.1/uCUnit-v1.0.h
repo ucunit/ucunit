@@ -4,6 +4,7 @@
  *                                                                           *
  *  (C) 2007 - 2008 Sven Stefan Krauss                                       *
  *                  https://www.ucunit.org                                   *
+ *  (C) 2018 Balazs Grill - IncQuery Labs Ltd.                               *
  *                                                                           *
  *  File        : uCUnit-v1.0.h                                              *
  *  Description : Macros for Unit-Testing                                    *
@@ -36,6 +37,8 @@
 
 #ifndef UCUNIT_0101_H_
 #define UCUNIT_0101_H_
+
+#include <System.h>
 
 /*****************************************************************************/
 /****** Customizing area ******/
@@ -148,9 +151,9 @@
  * UCUNIT_MODE_SILENT: Checks are performed silently.
  * UCUNIT_MODE_NORMAL: Only checks that fail are displayes
  * UCUNIT_MODE_VERBOSE: Passed and failed checks are displayed
+ * UCUNIT_MODE_JSON: Report is generated in json format
  */
-//#define UCUNIT_MODE_NORMAL
-#define UCUNIT_MODE_VERBOSE
+/* Mode is controlled via CMAKE option */
 
 /**
  * Max. number of checkpoints. This may depend on your application
@@ -166,7 +169,7 @@
 /* Some useful constants                                                     */
 /*****************************************************************************/
 
-#define UCUNIT_VERSION "v1.0" /* Version info */
+#define UCUNIT_VERSION "v1.1" /* Version info */
 
 #ifndef NULL
 #define NULL (void *)0
@@ -232,67 +235,15 @@ static int ucunit_index = 0; /* Tracepoint index */
  */
 #define UCUNIT_DefineToString(x)   UCUNIT_DefineToStringHelper(x)
 
-#ifdef UCUNIT_MODE_VERBOSE
 /**
- * @Macro:       UCUNIT_WritePassedMsg(msg, args)
+ * @Macro:       UCUNIT_DefineToString(x)
  *
- * @Description: Writes a message that check has passed.
+ * @Description: Converts an argument list to a string
  *
- * @Param msg:   Message to write. This is the name of the called
- *               Check, without the substring UCUNIT_Check.
- * @Param args:  Argument list as string.
- *
- * @Remarks:     This macro is used by UCUNIT_Check(). A message will
- *               only be written if verbose mode is set
- *               to UCUNIT_MODE_VERBOSE.
+ * @Param ...:   Argument list
  *
  */
-#define UCUNIT_WritePassedMsg(msg, args)                        \
-    do                                                          \
-    {                                                           \
-        UCUNIT_WriteString(__FILE__);                           \
-        UCUNIT_WriteString(":");                                \
-        UCUNIT_WriteString(UCUNIT_DefineToString(__LINE__));    \
-        UCUNIT_WriteString(": passed:");                        \
-        UCUNIT_WriteString(msg);                                \
-        UCUNIT_WriteString("(");                                \
-        UCUNIT_WriteString(args);                               \
-        UCUNIT_WriteString(")\n");                              \
-    } while(0)
-#else
-#define UCUNIT_WritePassedMsg(msg, args)
-#endif
-
-#ifdef UCUNIT_MODE_SILENT
-#define UCUNIT_WriteFailedMsg(msg, args)
-#else
-/**
- * @Macro:       UCUNIT_WriteFailedMsg(msg, args)
- *
- * @Description: Writes a message that check has failed.
- *
- * @Param msg:   Message to write. This is the name of the called
- *               Check, without the substring UCUNIT_Check.
- * @Param args:  Argument list as string.
- *
- * @Remarks:     This macro is used by UCUNIT_Check(). A message will
- *               only be written if verbose mode is set
- *               to UCUNIT_MODE_NORMAL and UCUNIT_MODE_VERBOSE.
- *
- */
-#define UCUNIT_WriteFailedMsg(msg, args)                        \
-    do                                                          \
-    {                                                           \
-        UCUNIT_WriteString(__FILE__);                           \
-        UCUNIT_WriteString(":");                                \
-        UCUNIT_WriteString(UCUNIT_DefineToString(__LINE__));    \
-        UCUNIT_WriteString(": failed:");                        \
-        UCUNIT_WriteString(msg);                                \
-        UCUNIT_WriteString("(");                                \
-        UCUNIT_WriteString(args);                               \
-        UCUNIT_WriteString(")\n");                              \
-    } while(0)
-#endif
+#define UCUNIT_ArgsToString(...) #__VA_ARGS__
 
 /**
  * @Macro:       UCUNIT_FailCheck(msg, args)
@@ -422,7 +373,21 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsEqual(expected,actual)         \
-    UCUNIT_Check( (expected) == (actual), "IsEqual", #expected "," #actual )
+    UCUNIT_Check( (expected) == (actual), "IsEqual", UCUNIT_ArgsToString(expected, actual) )
+
+/**
+ * @Macro:       UCUNIT_CheckIsNotEqual(unexpected,actual)
+ *
+ * @Description: Checks that the actual value is not equals with the unexpected value.
+ *
+ * @Param unexpected: Unexpected value.
+ * @Param actual: Actual value.
+ *
+ * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
+ *
+ */
+#define UCUNIT_CheckIsNotEqual(unexpected,actual)         \
+    UCUNIT_Check( (unexpected) != (actual), "IsNotEqual", UCUNIT_ArgsToString(unexpected, actual) )
 
 /**
  * @Macro:       UCUNIT_CheckIsNull(pointer)
@@ -464,7 +429,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsInRange(value, lower, upper)   \
-    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", #value "," #lower "," #upper)
+    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", UCUNIT_ArgsToString(value, lower, upper) )
 
 /**
  * @Macro:       UCUNIT_CheckIs8Bit(value)
@@ -520,7 +485,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsBitSet(value, bitno) \
-    UCUNIT_Check( (1==(((value)>>(bitno)) & 0x01) ), "IsBitSet", #value "," #bitno)
+    UCUNIT_Check( (1==(((value)>>(bitno)) & 0x01) ), "IsBitSet", UCUNIT_ArgsToString(value, bitno))
 
 /**
  * @Macro:       UCUNIT_CheckIsBitClear(value, bitno)
@@ -534,59 +499,7 @@ static int ucunit_index = 0; /* Tracepoint index */
  *
  */
 #define UCUNIT_CheckIsBitClear(value, bitno) \
-    UCUNIT_Check( (0==(((value)>>(bitno)) & 0x01) ), "IsBitClear", #value "," #bitno)
-
-/*****************************************************************************/
-/* Testcases */
-/*****************************************************************************/
-
-/**
- * @Macro:       UCUNIT_TestcaseBegin(name)
- *
- * @Description: Marks the beginning of a test case and resets
- *               the test case statistic.
- *
- * @Param name:  Name of the test case.
- *
- * @Remarks:     This macro uses UCUNIT_WriteString(msg) to print the name.
- *
- */
-#define UCUNIT_TestcaseBegin(name)                                        \
-    do                                                                    \
-    {                                                                     \
-        UCUNIT_WriteString("\n======================================\n"); \
-        UCUNIT_WriteString(name);                                         \
-        UCUNIT_WriteString("\n======================================\n"); \
-        ucunit_testcases_failed_checks = ucunit_checks_failed;            \
-    }                                                                     \
-    while(0)
-
-/**
- * @Macro:       UCUNIT_TestcaseEnd()
- *
- * @Description: Marks the end of a test case and calculates
- *               the test case statistics.
- *
- * @Remarks:     This macro uses UCUNIT_WriteString(msg) to print the result.
- *
- */
-#define UCUNIT_TestcaseEnd()                                         \
-    do                                                               \
-    {                                                                \
-        UCUNIT_WriteString("======================================\n");  \
-        if( 0==(ucunit_testcases_failed_checks - ucunit_checks_failed) ) \
-        {                                                            \
-            UCUNIT_WriteString("Testcase passed.\n");                \
-            ucunit_testcases_passed++;                               \
-        }                                                            \
-        else                                                         \
-        {                                                            \
-            UCUNIT_WriteFailedMsg("EndTestcase","");                 \
-            ucunit_testcases_failed++;                               \
-        }                                                            \
-        UCUNIT_WriteString("======================================\n"); \
-    }                                                                \
-    while(0)
+    UCUNIT_Check( (0==(((value)>>(bitno)) & 0x01) ), "IsBitClear", UCUNIT_ArgsToString(value, bitno))
 
 /*****************************************************************************/
 /* Support for code coverage */
@@ -645,31 +558,10 @@ static int ucunit_index = 0; /* Tracepoint index */
 #define UCUNIT_CheckTracepointCoverage(index)    \
     UCUNIT_Check( (ucunit_checkpoints[index]!=0), "TracepointCoverage", #index);
 
-/*****************************************************************************/
-/* Testsuite Summary                                                         */
-/*****************************************************************************/
-
-/**
- * @Macro:       UCUNIT_WriteSummary()
- *
- * @Description: Writes the test suite summary.
- *
- * @Remarks:     This macro uses UCUNIT_WriteString(msg) and
- *               UCUNIT_WriteInt(n) to write the summary.
- *
- */
-#define UCUNIT_WriteSummary()                                         \
-{                                                                     \
-    UCUNIT_WriteString("\n**************************************");   \
-    UCUNIT_WriteString("\nTestcases: failed: ");                      \
-    UCUNIT_WriteInt(ucunit_testcases_failed);                         \
-    UCUNIT_WriteString("\n           passed: ");                      \
-    UCUNIT_WriteInt(ucunit_testcases_passed);                         \
-    UCUNIT_WriteString("\nChecks:    failed: ");                      \
-    UCUNIT_WriteInt(ucunit_checks_failed);                            \
-    UCUNIT_WriteString("\n           passed: ");                      \
-    UCUNIT_WriteInt(ucunit_checks_passed);                            \
-    UCUNIT_WriteString("\n**************************************\n"); \
-}
+#ifdef UCUNIT_MODE_JSON
+#include "uCUnit-json.h"
+#else
+#include "uCUnit-hr.h"
+#endif
 
 #endif /*UCUNIT_H_*/
