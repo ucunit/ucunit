@@ -153,10 +153,15 @@
 #define UCUNIT_MODE_VERBOSE
 
 /**
- * Max. number of checkpoints. This may depend on your application
+ * Max. number of checkpoints (stored line number). This may depend on your application
  * or limited by your RAM.
  */
 #define UCUNIT_MAX_TRACEPOINTS 16
+
+/**
+ * Max. number of tracepoint calls (max. 2^16 - 1)
+ */
+#define UCUNIT_MAX_CALLS 65534
 
 /*****************************************************************************/
 /* **** End of customizing area *****                                        */
@@ -202,7 +207,7 @@ static int ucunit_checklist_failed_checks = 0; /* Number of failed checks in a c
 static int ucunit_action = UCUNIT_ACTION_WARNING; /* Action to take if a check fails */
 static int ucunit_checkpoints[UCUNIT_MAX_TRACEPOINTS]; /* Max. number of tracepoints */
 static int ucunit_index = 0; /* Tracepoint index */
-
+static int ucunit_call_counter[UCUNIT_MAX_TRACEPOINTS]; /* Number of trace point calls */
 /*****************************************************************************/
 /* Internal (private) Macros                                                 */
 /*****************************************************************************/
@@ -604,16 +609,25 @@ static int ucunit_index = 0; /* Tracepoint index */
  * @Param index: Index of the tracepoint.
  *
  * @Remarks:     This macro fails if index>UCUNIT_MAX_TRACEPOINTS.
+ *               Or calls exceed UCUNIT_MAX_CALLS
  *
  */
-#define UCUNIT_Tracepoint(index)                         \
-    if(index<UCUNIT_MAX_TRACEPOINTS)                     \
-    {                                                    \
-        ucunit_checkpoints[index] = __LINE__;            \
-    }                                                    \
-    else                                                 \
-    {                                                    \
-        UCUNIT_WriteFailedMsg("Tracepoint index", #index);     \
+#define UCUNIT_Tracepoint(index)                                \
+    if (ucunit_call_counter[index] < UCUNIT_MAX_CALLS)          \
+    {                                                           \
+        ucunit_call_counter[index]++;                           \
+    }                                                           \
+    else                                                        \
+    {                                                           \
+        UCUNIT_WriteFailedMsg("Tracepoint max. call", #index);  \
+    }                                                           \
+    if(index<UCUNIT_MAX_TRACEPOINTS)                            \
+    {                                                           \
+        ucunit_checkpoints[index] = __LINE__;                   \
+    }                                                           \
+    else                                                        \
+    {                                                           \
+        UCUNIT_WriteFailedMsg("Tracepoint index", #index);      \
     }
 
 /**
@@ -630,6 +644,7 @@ static int ucunit_index = 0; /* Tracepoint index */
     for (ucunit_index=0; ucunit_index<UCUNIT_MAX_TRACEPOINTS; ucunit_index++) \
     {                                                \
         ucunit_checkpoints[ucunit_index]=0;          \
+        ucunit_call_counter[ucunit_index]=0;         \
     }
 
 /**
@@ -644,6 +659,59 @@ static int ucunit_index = 0; /* Tracepoint index */
  */
 #define UCUNIT_CheckTracepointCoverage(index)    \
     UCUNIT_Check( (ucunit_checkpoints[index]!=0), "TracepointCoverage", #index);
+
+/**
+ * @Macro:       UCUNIT_TracepointCalled(index) 
+ * 
+ * @Description: Checks if a trace point was called at least once
+ * 
+ * @Param index: Index of the trace point.
+ * 
+ * @Remarks:     This macro fails if call count >= UCUNIT_MAX_CALLS
+ * 
+ */
+#define UCUNIT_TracepointCalled(index)      \
+    UCUNIT_Check( (ucunit_call_counter[index] > 0), "TracepointCalled", #index);
+
+/**
+ * @Macro:       UCUNIT_TracepointNotCalled(index) 
+ * 
+ * @Description: Checks if a trace point was not called
+ * 
+ * @Param index: Index of the trace point.
+ * 
+ * @Remarks:     This macro fails if call count >= UCUNIT_MAX_CALLS
+ * 
+ */
+#define UCUNIT_TracepointNotCalled(index)      \
+    UCUNIT_Check( (ucunit_call_counter[index] == 0), "TracepointNotCalled", #index);
+
+/**
+ * @Macro:       UCUNIT_TracepointCalledOnce(index) 
+ * 
+ * @Description: Checks if a trace point was called once
+ * 
+ * @Param index: Index of the trace point.
+ * 
+ * @Remarks:     This macro fails if call count >= UCUNIT_MAX_CALLS
+ * 
+ */
+#define UCUNIT_TracepointCalledOnce(index)      \
+    UCUNIT_Check( (ucunit_call_counter[index] == 1), "TracepointCalledOnce", #index);
+
+
+/**
+ * @Macro:       UCUNIT_TracepointCalledNTimes(index, count)
+ * 
+ * @Description: Checks if a trace point was called exactly n times
+ * 
+ * @Param index: Index of the trace point.
+ * 
+ * @Remarks:     This macro fails if call count >= UCUNIT_MAX_CALLS
+ * 
+ */
+#define UCUNIT_TracepointCalledNTimes(index, count) \
+    UCUNIT_Check( (ucunit_call_counter[index] == count), "TracepointCallCount", #index);
 
 /*****************************************************************************/
 /* Testsuite Summary                                                         */
