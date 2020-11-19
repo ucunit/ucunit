@@ -152,6 +152,7 @@
  * UCUNIT_MODE_NORMAL: Only checks that fail are displayes
  * UCUNIT_MODE_VERBOSE: Passed and failed checks are displayed
  * UCUNIT_MODE_JSON: Report is generated in json format
+ * UCUNIT_MODE_XML: Report is generated in xml format
  */
 /* Mode is controlled via CMAKE option */
 
@@ -170,6 +171,7 @@
 /*****************************************************************************/
 
 #define UCUNIT_VERSION "v1.1" /* Version info */
+#define UCUNIT_MODE_XML 1 /* Only for debugging! */
 
 #ifndef NULL
 #define NULL (void *)0
@@ -560,6 +562,8 @@ static int ucunit_index = 0; /* Tracepoint index */
 
 #ifdef UCUNIT_MODE_JSON
 #include "uCUnit-json.h"
+#elif UCUNIT_MODE_XML
+#include "uCUnit-xml.h"
 #else
 #include "uCUnit-hr.h"
 #endif

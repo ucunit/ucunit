@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../System.h"
+#include "../uCUnit-xml.h"
 
 /* Stub: Initialize your hardware here */
 void System_Init(void)
@@ -51,8 +52,15 @@ void System_Shutdown(void)
 {
 
 	/* asm("\tSTOP"); */
-	printf("System shutdown.\n");
-	exit(0);
+  UCUNIT_XmlTestSuite test;
+  UCUNIT_XML_GetTestsuite(&test);
+
+  char buffer[256] = { 0 };
+  UCUNIT_XML_GetPropertiesString(buffer);
+  printf(buffer);
+
+  printf("System shutdown.\n");
+  exit(0);
 }
 
 /* Stub: Recover your system from a safe state. */
