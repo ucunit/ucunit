@@ -17,7 +17,7 @@ LDFLAGS:=-g
 RUN:=cmd /C
 
 # Clean up
-RM:=del
+RM:=rm -f
 
 #----------------------------------------------------
 # Files
@@ -28,12 +28,15 @@ TARGET:=Testsuite.exe
 # Sourcefiles
 SRCS:=           \
 ./System.c       \
-../Testsuite.c   \
+./Testsuite.c   \
+./uCUnit-xml.c	\
 
 # Objectfiles
 OBJS:=           \
-./System.obj     \
-../Testsuite.obj \
+./template/System.o     \
+./Testsuite.o \
+./uCUnit-xml.o	\
+
 
 #----------------------------------------------------
 # Build all
@@ -49,12 +52,12 @@ run: $(TARGET)
 #----------------------------------------------------
 $(TARGET):	$(OBJS)
 	echo 'Linking...'
-	$(LD) $(LDFLAGS) -o $(notdir $@) $(notdir $(OBJS))
+	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 #----------------------------------------------------
 # Compiler
 #----------------------------------------------------
-%.obj: %.c
+%.obj: %.c 
 	echo 'Compiling...'
 	$(CC) $(CFLAGS) -o $(notdir $@) -c $<
 	
@@ -64,7 +67,7 @@ $(TARGET):	$(OBJS)
 clean:
 	echo 'Running clean...'
 	$(RM) $(TARGET)
-	$(RM) System.obj
-	$(RM) Testsuite.obj
+	$(RM) **/*.o core
+	$(RM) *.o core
 	echo 'Clean finished.'
 	
