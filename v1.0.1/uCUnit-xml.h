@@ -129,6 +129,7 @@
 /* ----- Structures -------------------------------------------------------- */
 
 /**
+ * The check types of the uCUnit framework.
  * TODO define all check type
  */
 typedef enum UCUNIT_CheckTypes
@@ -137,85 +138,161 @@ typedef enum UCUNIT_CheckTypes
 } UCUNIT_CheckType;
 
 /**
- * TODO create description
+ * Contains information and result data of a uCUnit test check
  */
 typedef struct UCUNIT_XmlChecks
 {
-    UCUNIT_CheckType type;
-    bool isPassed;
-    char* filePath;
-    char* lineNumber;
-    char* arguments;
+    UCUNIT_CheckType type;      /* Type of the check */
+    bool isPassed;              /* Result of the check */
+    char* filePath;             /* Pointer to the checked test file path string */
+    char* lineNumber;           /* Pointer to the checked test file line string */
+    char* arguments;            /* Pointer to the check arguments string */
 } UCUNIT_XmlCheck;
 
 /**
- * TODO create description
+ * Contains information and result data of a uCUnit test case
  */
 typedef struct UCUNIT_XmlTestCases
 {
-  char* testCaseName;
-  bool isPassed;
-  unsigned int numOfChecks;
-  UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS_PER_TESTCASE];
+  char* testCaseName;           /* Pointer to the test case name string */
+  bool isPassed;                /* Result of the test case */
+  unsigned int numOfChecks;     /* Number of the used test checks */
+  UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS_PER_TESTCASE];   /* Array of the test check objects */
 } UCUNIT_XmlTestCase;
 
 /**
- * TODO create description
+ * Contains information of a uCUnit test suite
  */
 typedef struct UCUNIT_XmlTestSuites
 {
-  char* testSuiteName;
-  struct tm time;
-  char* ucunitVersion;
-  unsigned int numOfTestCases;
-  UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES];
+  char* testSuiteName;          /* Pointer to the test suite name string */
+  struct tm time;               /* The time of the test suite start */
+  char* ucunitVersion;          /* Pointer to the uCUnit version string */
+  unsigned int numOfTestCases;  /* Number of the used test cases */
+  UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES];  /* Array of the test case objects */
 } UCUNIT_XmlTestSuite;
 
 /* ----- Prototypes -------------------------------------------------------- */
 
 /**
- * TODO create description
+ * Begins the test suite. Stores the test suite data into the static UCUNIT_XmlTestSuite structure.
+ * The following data are stored:
+ *     * the test suite name (testSuiteName parameter)
+ *     * the start time of the test suite
+ *     * the uCUnit version
+ * The function also set the number of test cases to 0.
+ *
+ * @param [in] testSuiteName Pointer to the test suite name.
  */
-void UCUNIT_XML_TestBegin(char* testSuitName);
+void UCUNIT_XML_TestBegin(char* testSuiteName);
 
 /**
- * TODO create description
+ * Begins the next test case. Stores the test case data into the UCUNIT_XmlTestCase structure.
+ * The next UCUNIT_XmlTestCase object is get from the static UCUNIT_XmlTestSuite
+ * and the number of test cases is increased.
+ * TODO: What should happen when there are no more available test case in the static object?
+ * The following data are stored:
+ *     * the test case name (testCaseName parameter)
+ * The function also set the number of test checks to 0.
+ *
+ * @param [in] testSuiteName Pointer to the test case name.
  */
 void UCUNIT_XML_TestcaseBegin(char* testCaseName);
 
 /**
- * TODO create description
+ * Ends the actual test case. Stores the result into the UCUNIT_XmlTestCase structure.
+ * The actual UCUNIT_XmlTestCase object is get from the static UCUNIT_XmlTestSuite.
+ *
+ * @param [in] isPassed Result of the test case.
  */
 void UCUNIT_XML_TestcaseEnd(bool isPassed);
 
 /**
- * TODO create description
+ * Adds a test check to the actual test case. Stores the check data into the UCUNIT_XmlCheck structure.
+ * The next UCUNIT_XmlCheck object is get from the actual UCUNIT_XmlTestCase
+ * and the number of test checks is increased.
+ * The following data are stored:
+ *     * the check result (isPassed parameter)
+ *     * the check type (maps the type parameter from string to UCUNIT_CheckType)
+ *     * the check arguments (arguments parameter)
+ *     * the checked file path string
+ *     * the checked file line string
+ *
+ * @param [in] isPassed Result of the test check.
+ * @param [in] type Pointer to the check's type string.
+ * @param [in] arguments Pointer to the check's arguments.
  */
 void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments);
 
 /**
- * TODO create description
+ * TODO create description?
  */
 void UCUNIT_XML_TestSummary(int testCasesFailed, int testCasesPassed, int checksFailed, int checksPassed);
 
 /**
- * TODO create description
+ * Returns with the static UCUNIT_XmlTestSuite object.
+ *
+ * @param [out] testSuite Pointer to the output test suite object.
  */
-void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite* test);
+void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite* testSuite);
 
 /**
- * TODO create description
+ * Create the header meta-data part of the an XML file.
+ * The output will be to following:
+ *     <?xml version="1.0" encoding="utf-8"?>
+ *
+ * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetHeaderString(char* xmlString);
+void UCUNIT_XML_GetXmlHeader(char* xmlString);
 
 /**
- * TODO create description
+ * Calculates the test suite results and converts them into an XML string.
+ * The output will have the following structure:
+ *     <testsuite errors="[number of test case errors]"
+ *                failures="[number of test check failures]"
+ *                name="[test suite name]"
+ *                tests="[number of test cases]">
+ *
+ * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetPropertiesString(char* xmlString);
+void UCUNIT_XML_GetTestsuiteBegin(char* xmlString);
 
 /**
- * TODO create description
+ * Converts the test suite meta-data into an XML string.
+ * The output will have the following structure:
+ *     <properties>
+ *         <property name="compiled" value="[date in 'Month(short) Day Year' format]"/>
+ *         <property name="time" value="[start time of the test suite]"/>
+ *         <property name="ucunit-version" value="[version of the uCUnit]"/>
+ *     </properties>
+ *
+ * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestcasesString(char* xmlString);
+void UCUNIT_XML_GetProperties(char* xmlString);
+
+/**
+ * Converts the test cases into an XML string.
+ * The output will have the following structure:
+ *     <testcase name="[test case name]">
+ *         <system-out>
+ *             <![CDATA[
+ *                 [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *                 [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *             ]]>
+ *         </system-out>
+ *     </testcase>
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_GetTestcases(char* xmlString);
+
+/**
+ * Create the test suite close tag into an XML string.
+ * The output will be to following:
+ *     </testsuite>
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_GetTestsuiteClose(char *xmlString);
 
 #endif /* UCUNIT_XML_H_ */

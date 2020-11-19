@@ -52,15 +52,12 @@ void System_Shutdown(void)
 {
 
 	/* asm("\tSTOP"); */
-  UCUNIT_XmlTestSuite test;
-  UCUNIT_XML_GetTestsuite(&test);
+    char buffer[256] = { 0 };
+    UCUNIT_XML_GetProperties(buffer);
+    printf(buffer);
 
-  char buffer[256] = { 0 };
-  UCUNIT_XML_GetPropertiesString(buffer);
-  printf(buffer);
-
-  printf("System shutdown.\n");
-  exit(0);
+    printf("System shutdown.\n");
+    exit(0);
 }
 
 /* Stub: Recover your system from a safe state. */

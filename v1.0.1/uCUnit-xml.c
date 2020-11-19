@@ -46,12 +46,17 @@ void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite *testSuite)
     *testSuite = staticTestSuite;
 }
 
-void UCUNIT_XML_GetHeaderString(char* xmlString)
+void UCUNIT_XML_GetXmlHeader(char* xmlString)
 {
     /* TODO implement */
 }
 
-void UCUNIT_XML_GetPropertiesString(char *xmlString)
+void UCUNIT_XML_GetTestsuiteBegin(char* xmlString)
+{
+    /* TODO implement */
+}
+
+void UCUNIT_XML_GetProperties(char* xmlString)
 {
     strcat(xmlString, "<properties>\n");
 
@@ -81,10 +86,16 @@ void UCUNIT_XML_GetPropertiesString(char *xmlString)
     strcat(xmlString, "</properties>\n");
 }
 
-void UCUNIT_XML_GetTestcasesString(char* xmlString)
+void UCUNIT_XML_GetTestcases(char* xmlString)
 {
     /* TODO implement */
 }
+
+void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
+{
+    /* TODO implement */
+}
+
 #else
 void UCUNIT_XML_TestBegin(char* testSuitName)
 {
@@ -116,17 +127,27 @@ void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite* test)
     /* Empty implementation */
 }
 
-void UCUNIT_XML_GetHeaderString(char* xmlString)
+void UCUNIT_XML_GetXmlHeader(char* xmlString)
 {
     /* Empty implementation */
 }
 
-void UCUNIT_XML_GetPropertiesString(char* xmlString)
+void UCUNIT_XML_GetTestsuiteBegin(char* xmlString)
 {
     /* Empty implementation */
 }
 
-void UCUNIT_XML_GetTestcasesString(char* xmlString)
+void UCUNIT_XML_GetProperties(char* xmlString)
+{
+    /* Empty implementation */
+}
+
+void UCUNIT_XML_GetTestcases(char* xmlString)
+{
+    /* Empty implementation */
+}
+
+void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
 {
     /* Empty implementation */
 }
