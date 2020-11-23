@@ -23,7 +23,7 @@ RM:=rm -f
 # Files
 #----------------------------------------------------
 # Name of target file
-TARGET:=Testsuite.exe
+TARGET:=Testsuite
 
 # Sourcefiles
 SRCS:=           \
@@ -37,6 +37,9 @@ OBJS:=           \
 ./Testsuite.o \
 ./uCUnit-xml.o	\
 
+# Dependencies
+
+DEPS:=			\
 
 #----------------------------------------------------
 # Build all
@@ -57,7 +60,7 @@ $(TARGET):	$(OBJS)
 #----------------------------------------------------
 # Compiler
 #----------------------------------------------------
-%.obj: %.c 
+%.obj: %.c
 	echo 'Compiling...'
 	$(CC) $(CFLAGS) -o $(notdir $@) -c $<
 	
@@ -66,8 +69,8 @@ $(TARGET):	$(OBJS)
 #----------------------------------------------------
 clean:
 	echo 'Running clean...'
-	$(RM) $(TARGET)
-	$(RM) **/*.o core
-	$(RM) *.o core
+	$(RM) ./$(TARGET)
+	$(RM) ./**/*.o core
+	$(RM) ./*.o core
 	echo 'Clean finished.'
 	

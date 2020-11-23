@@ -125,24 +125,16 @@
 /* TODO: Calculate the real value of this after the implementation is done. */
 #define MAX_NUM_OF_TEST_CASES            20
 #define MAX_NUM_OF_CHECKS_PER_TESTCASE   20
+#define MAX_NUM_Of_TEST_SUITES			  5
 
 /* ----- Structures -------------------------------------------------------- */
-
-/**
- * The check types of the uCUnit framework.
- * TODO define all check type
- */
-typedef enum UCUNIT_CheckTypes
-{
-    UCUNIT_CheckTypeIsEqual = 0
-} UCUNIT_CheckType;
 
 /**
  * Contains information and result data of a uCUnit test check
  */
 typedef struct UCUNIT_XmlChecks
 {
-    UCUNIT_CheckType type;      /* Type of the check */
+    char* type;      			/* Pointer to the type of the check */
     bool isPassed;              /* Result of the check */
     char* filePath;             /* Pointer to the checked test file path string */
     char* lineNumber;           /* Pointer to the checked test file line string */
@@ -166,8 +158,8 @@ typedef struct UCUNIT_XmlTestCases
 typedef struct UCUNIT_XmlTestSuites
 {
   char* testSuiteName;          /* Pointer to the test suite name string */
-  struct tm time;               /* The time of the test suite start */
-  char* ucunitVersion;          /* Pointer to the uCUnit version string */
+  struct tm time;				/* The time of the test suite start */
+  char* ucunitVersion;        	/* Pointer to the uCUnit version string */
   unsigned int numOfTestCases;  /* Number of the used test cases */
   UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES];  /* Array of the test case objects */
 } UCUNIT_XmlTestSuite;

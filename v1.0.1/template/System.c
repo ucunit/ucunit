@@ -53,9 +53,8 @@ void System_Shutdown(void)
 
 	/* asm("\tSTOP"); */
     char buffer[256] = { 0 };
-    UCUNIT_XML_GetProperties(buffer);
+    UCUNIT_XML_GetXmlObject(buffer);
     printf(buffer);
-
     printf("System shutdown.\n");
     exit(0);
 }
