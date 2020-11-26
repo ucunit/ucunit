@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifdef UCUNIT_MODE_XML
 /**
@@ -38,7 +39,7 @@
 #define UCUNIT_WritePassedMsg(msg, args)                \
     do                                                  \
     {                                                   \
-        UCUNIT_XML_CheckExecuted(true, msg, args);      \
+        UCUNIT_XML_CheckExecuted(true, msg, args, __FILE__, UCUNIT_DefineToString(__LINE__));      \
     } while(0)
 
 /**
@@ -58,7 +59,7 @@
 #define UCUNIT_WriteFailedMsg(msg, args)                \
     do                                                  \
     {                                                   \
-        UCUNIT_XML_CheckExecuted(false, msg, args);     \
+        UCUNIT_XML_CheckExecuted(false, msg, args, __FILE__, UCUNIT_DefineToString(__LINE__));     \
     } while(0)
 
 /**
@@ -116,10 +117,7 @@
  *               UCUNIT_WriteInt(n) to write the summary.
  *
  */
-#define UCUNIT_WriteSummary()   \
-{                               \
-                                \
-}
+#define UCUNIT_WriteSummary()
 #endif
 
 /* TODO: Calculate the real value of this after the implementation is done. */
@@ -214,7 +212,7 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  * @param [in] type Pointer to the check's type string.
  * @param [in] arguments Pointer to the check's arguments.
  */
-void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments);
+void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line);
 
 /**
  * TODO create description?
@@ -286,5 +284,7 @@ void UCUNIT_XML_GetTestcases(char* xmlString);
  * @param [out] xmlString Pointer to the output string array.
  */
 void UCUNIT_XML_GetTestsuiteClose(char *xmlString);
+
+void UCUNIT_XML_GetXmlObject(char *xmlString);
 
 #endif /* UCUNIT_XML_H_ */

@@ -43,14 +43,14 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed)
 	staticTestSuite.testCases[staticTestSuite.numOfTestCases-1].isPassed = isPassed;
 }
 
-void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments)
+void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line)
 {
 	UCUNIT_XmlCheck check;
 	check.isPassed = isPassed;
 	check.type = type;
 	check.arguments = arguments;
-	check.filePath =__FILE__;
-	check.lineNumber = UCUNIT_DefineToString(__LINE__);
+	check.filePath = file;
+	check.lineNumber = line;
 	staticTestSuite.testCases[staticTestSuite.numOfTestCases-1].
 	checks[staticTestSuite.testCases[staticTestSuite.numOfTestCases-1].numOfChecks]=check;
 	staticTestSuite.testCases[staticTestSuite.numOfTestCases-1].numOfChecks += 1;
@@ -75,7 +75,7 @@ void UCUNIT_XML_GetTestsuiteBegin(char* xmlString)
 {
 	char tempBuffer[64] = { 0 };
 	sprintf(tempBuffer, "<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n",
-			ucunit_checks_failed,
+			ucunit_testcases_failed,
 			staticTestSuite.testSuiteName,
 			staticTestSuite.numOfTestCases);
 	strncat(xmlString, tempBuffer, strlen(tempBuffer));
@@ -128,12 +128,11 @@ void UCUNIT_XML_GetTestcases(char* xmlString)
 
 		for (j = 0; j <staticTestSuite.testCases[i].numOfChecks; ++j )
 		{
-			sprintf(tempBuffer, "\t\t\t\t\t%s:%d %s(%s)",
-					__FILE__,
-					__LINE__,
+			sprintf(tempBuffer, "\t\t\t\t\t%s:%s %s(%s)",
+					staticTestSuite.testCases[i].checks[j].filePath,
+					staticTestSuite.testCases[i].checks[j].lineNumber,
 					staticTestSuite.testCases[i].checks[j].type,
 					staticTestSuite.testCases[i].checks[j].arguments);
-			/* TODO correct error */
 			strncat(xmlString, tempBuffer, strlen(tempBuffer));
 			memset(tempBuffer, 0, sizeof(tempBuffer));
 			if ( (staticTestSuite.testCases[i].checks[j].isPassed) ) { strcat(xmlString, " passed\n"); } else { strcat(xmlString, " failed\n"); }
@@ -145,16 +144,19 @@ void UCUNIT_XML_GetTestcases(char* xmlString)
 
 void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
 {
-	strcat(xmlString, "</testsuite>");
+	strcat(xmlString, "</testsuite>\n");
 }
 
-void UCUNIT_XML_GetXmlObject(char* xmlString)
+void UCUNIT_XML_GetXmlObject(char *xmlString)
 {
+
+
 	UCUNIT_XML_GetXmlHeader(xmlString);
 	UCUNIT_XML_GetTestsuiteBegin(xmlString);
 	UCUNIT_XML_GetProperties(xmlString);
-	//UCUNIT_XML_GetTestcases(xmlString);
-	//UCUNIT_XML_GetTestsuiteClose(xmlString);
+	UCUNIT_XML_GetTestcases(xmlString);
+	UCUNIT_XML_GetTestsuiteClose(xmlString);
+
 }
 
 #else
@@ -173,7 +175,7 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed)
     /* Empty implementation */
 }
 
-void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments)
+void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line)
 {
     /* Empty implementation */
 }
@@ -211,5 +213,9 @@ void UCUNIT_XML_GetTestcases(char* xmlString)
 void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
 {
     /* Empty implementation */
+}
+void UCUNIT_XML_GetXmlObject(char *xmlString)
+{
+	/* Empty implementation */
 }
 #endif
