@@ -95,12 +95,10 @@
         if (0==(ucunit_testcases_failed_checks - ucunit_checks_failed)) \
         {                                                               \
             UCUNIT_XML_TestcaseEnd(true);                               \
-            ucunit_testcases_passed++;                                  \
         }                                                               \
         else                                                            \
         {                                                               \
             UCUNIT_XML_TestcaseEnd(false);                              \
-            ucunit_testcases_failed++;                                  \
         }                                                               \
     } while(0)
 
@@ -122,8 +120,7 @@
 
 /* TODO: Calculate the real value of this after the implementation is done. */
 #define MAX_NUM_OF_TEST_CASES            20
-#define MAX_NUM_OF_CHECKS_PER_TESTCASE   20
-#define MAX_NUM_Of_TEST_SUITES			  5
+#define MAX_NUM_OF_CHECKS_PER_TESTCASE   40
 
 /* ----- Structures -------------------------------------------------------- */
 
@@ -155,6 +152,7 @@ typedef struct UCUNIT_XmlTestCases
  */
 typedef struct UCUNIT_XmlTestSuites
 {
+  unsigned int xml_buffer_size; /* Size of the XML string's output array*/
   char* testSuiteName;          /* Pointer to the test suite name string */
   struct tm time;				/* The time of the test suite start */
   char* ucunitVersion;        	/* Pointer to the uCUnit version string */
@@ -208,14 +206,16 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  *     * the checked file path string
  *     * the checked file line string
  *
- * @param [in] isPassed Result of the test check.
+ * @param [in] isPassed Result of the test case.
  * @param [in] type Pointer to the check's type string.
  * @param [in] arguments Pointer to the check's arguments.
+ * @param [in] file The file where the check was executed.
+ * @param [in] line The line number of the check where it was executed.
  */
 void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line);
 
 /**
- * TODO create description?
+ * TODO: Create description
  */
 void UCUNIT_XML_TestSummary(int testCasesFailed, int testCasesPassed, int checksFailed, int checksPassed);
 
@@ -270,6 +270,11 @@ void UCUNIT_XML_GetProperties(char* xmlString);
  *                 [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
  *             ]]>
  *         </system-out>
+ *         (if there's failed a check in the testcase)
+ *         <failure>
+ *             [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *             [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *         </failure>
  *     </testcase>
  *
  * @param [out] xmlString Pointer to the output string array.
@@ -285,6 +290,27 @@ void UCUNIT_XML_GetTestcases(char* xmlString);
  */
 void UCUNIT_XML_GetTestsuiteClose(char *xmlString);
 
+/**
+ * Calls all the methods that creates the XML string.
+ * The output will be the complete XML string.
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
 void UCUNIT_XML_GetXmlObject(char *xmlString);
+
+/**
+ * Converts the test checks into an XML string.
+ * The output will have the following structure:
+ *     [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *     [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
+
+unsigned int getSizeOfSystemOut();
+unsigned int getSizeOfFailures();
+unsigned int getSizeOfCheck(int i, int j, const char *result);
+unsigned int getSizeOfTestsuite();
 
 #endif /* UCUNIT_XML_H_ */
