@@ -152,7 +152,7 @@ typedef struct UCUNIT_XmlTestCases
  */
 typedef struct UCUNIT_XmlTestSuites
 {
-  unsigned int xml_buffer_size; /* Size of the XML string's output array*/
+  unsigned int xmlBufferSize; /* Size of the XML string's output array*/
   char* testSuiteName;          /* Pointer to the test suite name string */
   struct tm time;				/* The time of the test suite start */
   char* ucunitVersion;        	/* Pointer to the uCUnit version string */
