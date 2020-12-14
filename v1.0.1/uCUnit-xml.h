@@ -313,5 +313,9 @@ unsigned int getSizeOfSystemOut();
 unsigned int getSizeOfFailures();
 unsigned int getSizeOfCheck(int i, int j, const char *result);
 unsigned int getSizeOfTestsuite();
+unsigned int getSizeOfHeader();
+unsigned int getSizeOfProperties();
+unsigned int getSizeOfTestcases();
+
 
 #endif /* UCUNIT_XML_H_ */
