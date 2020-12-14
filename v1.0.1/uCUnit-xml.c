@@ -9,8 +9,6 @@
 
 #include "uCUnit-xml.h"
 #include "uCUnit-v1.0.h"
-#include <stdio.h>
-#include <string.h>
 
 #define BUFFER_SIZE   256
 #define XML_VERSION "1.0"
@@ -71,7 +69,10 @@ void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite *testSuite)
 
 void UCUNIT_XML_GetXmlHeader(char *xmlString)
 {
-    char tempBuffer[64] = { 0 };
+    unsigned int bufferSize = strlen("<?xml version=\"%s\" encoding=\"%s\"?>\n");
+    bufferSize += strlen(XML_VERSION);
+    bufferSize += strlen(XML_ENCODING);
+    char tempBuffer[bufferSize];
     sprintf(tempBuffer, "<?xml version=\"%s\" encoding=\"%s\"?>\n",
     XML_VERSION,
             XML_ENCODING);
@@ -81,7 +82,11 @@ void UCUNIT_XML_GetXmlHeader(char *xmlString)
 
 void UCUNIT_XML_GetTestsuiteBegin(char *xmlString)
 {
-    char tempBuffer[64] = { 0 };
+    unsigned int bufferSize = strlen("<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n");
+    bufferSize += strlen(UCUNIT_DefineToString(ucunit_testcases_failed));
+    bufferSize += strlen(staticTestSuite.testSuiteName);
+    bufferSize += strlen(UCUNIT_DefineToString(staticTestSuite.numOfTestCases));
+    char tempBuffer[bufferSize];
 
     sprintf(tempBuffer,
             "<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n",
@@ -98,9 +103,8 @@ void UCUNIT_XML_GetProperties(char *xmlString)
 
     char tempBuffer[64] = { 0 };
 
-    char formatted_date[40];
+    char formatted_date[20];
     strftime(formatted_date, 40, "%B %d %Y", &staticTestSuite.time);
-
     sprintf(tempBuffer, "\t\t<property name=\"compiled\" value=\"%s\"/>\n",
             formatted_date);
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
@@ -127,7 +131,8 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
     for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
     {
         unsigned int bufferSize = strlen(staticTestSuite.testCases[i].testCaseName);
-        char tempBuffer[bufferSize+22];
+        bufferSize += strlen("\t\t<testcase name=\"%s\">\n");
+        char tempBuffer[bufferSize];
         memset(tempBuffer, 0, sizeof(tempBuffer));
 
         sprintf(tempBuffer, "\t\t<testcase name=\"%s\">\n",
@@ -137,10 +142,8 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
         strcat(xmlString, "\t\t\t<system-out>\n");
         strcat(xmlString, "\t\t\t\t![CDATA[\n");
 
-        bufferSize = getSizeOfSystemOut(i);
-        char systemOut[bufferSize];
-        bufferSize = getSizeOfFailures(i);
-        char failures[bufferSize];
+        char systemOut[getSizeOfSystemOut(i)];
+        char failures[getSizeOfSystemOut(i)];
 
         memset(systemOut, 0, sizeof(systemOut));
         memset(failures, 0, sizeof(failures));
@@ -165,9 +168,8 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
             strcat(xmlString, "\t\t\t<failure>\n");
             strncat(xmlString, failures, strlen(failures));
             memset(failures, 0, sizeof(failures));
-            strcat(xmlString, "\t\t\t<failure>\n");
+            strcat(xmlString, "\t\t\t</failure>\n");
         }
-
         strcat(xmlString, "\t\t</testcase>\n");
     }
     strcat(xmlString, "\t</testcases>\n");
@@ -175,11 +177,7 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
 
 void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
 {
-
-    unsigned int bufferSize = 0;
-    bufferSize = getSizeOfCheck(i, j, result);
-
-    char tempBuffer[bufferSize];
+    char tempBuffer[getSizeOfCheck(i, j, result)];
     memset(tempBuffer, 0, sizeof(tempBuffer));
 
     sprintf(tempBuffer, "\t\t\t\t%s:%s %s(%s) %s\n",
@@ -199,6 +197,8 @@ void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
 
 void UCUNIT_XML_GetXmlObject(char *xmlString)
 {
+//    char tempBuffer[staticTestSuite.xmlBufferSize];
+//    memset(tempBuffer, 0, sizeof(tempBuffer));
 
     UCUNIT_XML_GetXmlHeader(xmlString);
     UCUNIT_XML_GetTestsuiteBegin(xmlString);
@@ -206,6 +206,7 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
     UCUNIT_XML_GetTestcases(xmlString);
     UCUNIT_XML_GetTestsuiteClose(xmlString);
 
+//    strncat(xmlString, tempBuffer, strlen(tempBuffer));
 }
 
 unsigned int getSizeOfSystemOut(int i)
@@ -254,16 +255,41 @@ unsigned int getSizeOfCheck(int i, int j, const char *result)
 
 unsigned int getSizeOfTestsuite()
 {
-
+    /*xml_header*/
+    staticTestSuite.xmlBufferSize = strlen("<?xml version=\"%s\" encoding=\"%s\"?>\n");
+    staticTestSuite.xmlBufferSize = strlen(XML_VERSION);
+    staticTestSuite.xmlBufferSize = strlen(XML_ENCODING);
+    /*properties*/
+    staticTestSuite.xmlBufferSize += strlen("\t<properties>\n");
+    staticTestSuite.xmlBufferSize += strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n");
+    staticTestSuite.xmlBufferSize += 20;
+    staticTestSuite.xmlBufferSize += strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n");
+    staticTestSuite.xmlBufferSize += strlen(UCUNIT_DefineToString(staticTestSuite.time.tm_hour));
+    staticTestSuite.xmlBufferSize += strlen(UCUNIT_DefineToString(staticTestSuite.time.tm_min));
+    staticTestSuite.xmlBufferSize += strlen(UCUNIT_DefineToString(staticTestSuite.time.tm_sec));
+    staticTestSuite.xmlBufferSize += strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n");
+    staticTestSuite.xmlBufferSize += strlen(UCUNIT_DefineToString(staticTestSuite.ucunitVersion));
+    staticTestSuite.xmlBufferSize += strlen("\t</properties>\n");
+    /*testcases*/
     unsigned int i;
     unsigned int j;
     for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
     {
-        staticTestSuite += strlen(staticTestSuite.testCases[i].testCaseName)+22;
+        staticTestSuite.xmlBufferSize += strlen(staticTestSuite.testCases[i].testCaseName);
+        staticTestSuite.xmlBufferSize += strlen("\t\t<testcase name=\"%s\">\n");
 
         staticTestSuite.xmlBufferSize += getSizeOfSystemOut(i);
-        staticTestSuite.xmlBufferSize += getSizeOfFailures(i);
+        if (!(staticTestSuite.testCases[i].isPassed))
+        {
+            staticTestSuite.xmlBufferSize += strlen("\t\t\t<failure>\n");
+            staticTestSuite.xmlBufferSize += getSizeOfFailures(i);
+            staticTestSuite.xmlBufferSize += strlen("\t\t\t</failure>\n");
+        }
+        staticTestSuite.xmlBufferSize += strlen("\t\t</testcase>\n");
     }
+    staticTestSuite.xmlBufferSize += strlen("\t</testcases>\n");
+    staticTestSuite.xmlBufferSize += strlen("</testsuite>\n");
+
     return staticTestSuite.xmlBufferSize;
 }
 

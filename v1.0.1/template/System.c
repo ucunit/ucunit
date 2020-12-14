@@ -52,8 +52,9 @@ void System_Shutdown(void)
 {
 
 	/* asm("\tSTOP"); */
-    char buffer[2048] = { 0 };
-	//char buffer[getSizeOfTestsuite()];
+//    char buffer[getSizeOfTestsuite()];
+//    memset(buffer, 0, sizeof(buffer));
+    char buffer[2048];
 	UCUNIT_XML_GetXmlObject(buffer);
 	printf(buffer);
 
