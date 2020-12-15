@@ -316,6 +316,8 @@ unsigned int getSizeOfTestsuite();
 unsigned int getSizeOfHeader();
 unsigned int getSizeOfProperties();
 unsigned int getSizeOfTestcases();
+unsigned int getSizeOfTestsuiteBegin();
+void UCUNIT_XML_GetTestcase(char *xmlString, int i);
 
 
 #endif /* UCUNIT_XML_H_ */
