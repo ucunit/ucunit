@@ -19,7 +19,7 @@
 #define UCUNIT_TestBegin(name)          \
     do                                  \
     {                                   \
-      UCUNIT_XML_TestBegin(name);       \
+      UCUNIT_XML_TestBegin(name, __FILE__);       \
     } while(0)
 
 
@@ -153,7 +153,7 @@ typedef struct UCUNIT_XmlTestCases
  */
 typedef struct UCUNIT_XmlTestSuites
 {
-  unsigned int xmlBufferSize; /* Size of the XML string's output array*/
+  char* filePath;               /* Pointer to the test suite file path string */
   char* testSuiteName;          /* Pointer to the test suite name string */
   struct tm time;				/* The time of the test suite start */
   char* ucunitVersion;        	/* Pointer to the uCUnit version string */
@@ -172,8 +172,9 @@ typedef struct UCUNIT_XmlTestSuites
  * The function also set the number of test cases to 0.
  *
  * @param [in] testSuiteName Pointer to the test suite name.
+ * @param [in] file Pointer to the test suite file.
  */
-void UCUNIT_XML_TestBegin(char* testSuiteName);
+void UCUNIT_XML_TestBegin(char* testSuiteName,  char *file);
 
 /**
  * Begins the next test case. Stores the test case data into the UCUNIT_XmlTestCase structure.
@@ -309,8 +310,9 @@ void UCUNIT_XML_GetXmlObject(char *xmlString);
  */
 void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
 
-unsigned int getSizeOfTestsuite();
 void UCUNIT_XML_GetTestcase(char *xmlString, int i);
+void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
+unsigned int getSizeOfTestsuite();
 
 
 #endif /* UCUNIT_XML_H_ */

@@ -56,6 +56,7 @@ void System_Shutdown(void)
     memset(buffer, 0, sizeof(buffer));
 	UCUNIT_XML_GetXmlObject(buffer);
 	printf(buffer);
+	UCUNIT_XML_WriteXmlObjectToFile(buffer);
 
     printf("System shutdown.\n");
     exit(0);

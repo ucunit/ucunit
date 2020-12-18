@@ -137,19 +137,22 @@ static unsigned int getSizeOfTestcases()
 
 unsigned int getSizeOfTestsuite()
 {
-    staticTestSuite.xmlBufferSize += getSizeOfHeader();
-    staticTestSuite.xmlBufferSize += getSizeOfTestsuiteBegin();
-    staticTestSuite.xmlBufferSize += getSizeOfProperties();
-    staticTestSuite.xmlBufferSize += getSizeOfTestcases();
-    staticTestSuite.xmlBufferSize += strlen("</testsuite>\n");
+    unsigned int bufferSize = 0;
 
-    return staticTestSuite.xmlBufferSize;
+    bufferSize += getSizeOfHeader();
+    bufferSize += getSizeOfTestsuiteBegin();
+    bufferSize += getSizeOfProperties();
+    bufferSize += getSizeOfTestcases();
+    bufferSize += strlen("</testsuite>\n");
+
+    return bufferSize;
 }
 
 /* ----- Setting up the test data structures -------------------------------------- */
-void UCUNIT_XML_TestBegin(char *testSuiteName)
+void UCUNIT_XML_TestBegin(char *testSuiteName, char *file)
 {
     staticTestSuite.testSuiteName = testSuiteName;
+    staticTestSuite.filePath = file;
     time_t currentTime = time(NULL);
     staticTestSuite.time = *localtime(&currentTime);
     staticTestSuite.ucunitVersion = UCUNIT_VERSION;
@@ -325,6 +328,22 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
     UCUNIT_XML_GetProperties(xmlString);
     UCUNIT_XML_GetTestcases(xmlString);
     UCUNIT_XML_GetTestsuiteClose(xmlString);
+}
+
+void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
+{
+    char outputfile[strlen(staticTestSuite.filePath)+strlen("./")+3];
+    memset(outputfile, 0, sizeof(outputfile));
+    strcat(outputfile, "./");
+    strncat(outputfile, &staticTestSuite.filePath[0], strlen(staticTestSuite.filePath)-1);
+    strcat(outputfile, "xml");
+
+    FILE *fp;
+
+    fp = fopen(outputfile, "w+");
+    fprintf(fp, xmlString);
+    fclose(fp);
+
 }
 
 #else
