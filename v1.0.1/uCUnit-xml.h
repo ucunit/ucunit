@@ -309,14 +309,7 @@ void UCUNIT_XML_GetXmlObject(char *xmlString);
  */
 void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
 
-unsigned int getSizeOfSystemOut();
-unsigned int getSizeOfFailures();
-unsigned int getSizeOfCheck(int i, int j, const char *result);
 unsigned int getSizeOfTestsuite();
-unsigned int getSizeOfHeader();
-unsigned int getSizeOfProperties();
-unsigned int getSizeOfTestcases();
-unsigned int getSizeOfTestsuiteBegin();
 void UCUNIT_XML_GetTestcase(char *xmlString, int i);
 
 
