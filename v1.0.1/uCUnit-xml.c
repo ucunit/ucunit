@@ -24,7 +24,7 @@ static unsigned int getSizeOfHeader()
 {
     unsigned int bufferSize = 0;
 
-    bufferSize += strlen("<?xml version=\"%s\" encoding=\"%s\"?>\n") - 4;
+    bufferSize += 31; // strlen("<?xml version=\"%s\" encoding=\"%s\"?>\n") - 4
     bufferSize += strlen(XML_VERSION);
     bufferSize += strlen(XML_ENCODING);
 
@@ -35,16 +35,16 @@ static unsigned int getSizeOfProperties()
 {
     unsigned int bufferSize = 0;
 
-    bufferSize += strlen("\t<properties>\n");
-    bufferSize += strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n") - 2;
-    bufferSize += 20; /*size of formatted date string*/
-    bufferSize += strlen("\t\t<property name=\"time\" value=\"%02d:%02d:%02d\"/>\n") - 9;
+    bufferSize += 14; // strlen("\t<properties>\n")
+    bufferSize += 39; // strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n") - 2
+    bufferSize += 20; // size of formatted date string
+    bufferSize += 40; // strlen("\t\t<property name=\"time\" value=\"%02d:%02d:%02d\"/>\n") - 9
     bufferSize += sizeof(staticTestSuite.time.tm_hour);
     bufferSize += sizeof(staticTestSuite.time.tm_min);
     bufferSize += sizeof(staticTestSuite.time.tm_sec);
-    bufferSize += strlen("\t\t<property name=\"ucunit-version\" value=\"%s\"/>\n") - 2;
+    bufferSize += 45; // strlen("\t\t<property name=\"ucunit-version\" value=\"%s\"/>\n") - 2
     bufferSize += strlen(staticTestSuite.ucunitVersion);
-    bufferSize += strlen("\t</properties>\n");
+    bufferSize += 15; // strlen("\t</properties>\n")
 
     return bufferSize;
 }
@@ -53,7 +53,7 @@ static unsigned int getSizeOfTestsuiteBegin()
 {
     unsigned int bufferSize = 0;
 
-    bufferSize += strlen("<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n") - 6;
+    bufferSize += 52; // strlen("<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n") - 6
     bufferSize += sizeof(ucunit_testcases_failed);
     bufferSize += strlen(staticTestSuite.testSuiteName);
     bufferSize += sizeof(staticTestSuite.numOfTestCases);
@@ -65,7 +65,7 @@ static unsigned int getSizeOfCheck(int i, int j, const char *result)
 {
     unsigned int bufferSize = 0;
 
-    bufferSize += strlen("\t\t\t\t%s:%s %s(%s) %s\n") - 10;
+    bufferSize += 10; // strlen("\t\t\t\t%s:%s %s(%s) %s\n") - 10
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].type);
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].arguments);
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].lineNumber);
@@ -84,7 +84,7 @@ static unsigned int getSizeOfSystemOut(int i)
     {
         if ((staticTestSuite.testCases[i].checks[j].isPassed))
         {
-            bufferSize += 1; /*\t*/
+            bufferSize += 1; // strlen("\t")
             bufferSize += getSizeOfCheck(i,j, "passed");
         }
     }
@@ -115,21 +115,19 @@ static unsigned int getSizeOfTestcases()
     for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
     {
         bufferSize += strlen(staticTestSuite.testCases[i].testCaseName);
-        bufferSize += strlen("\t\t<testcase name=\"%s\">\n") - 2;
-        bufferSize += strlen("\t\t\t<system-out>\n");
-        bufferSize += strlen("\t\t\t\t<![CDATA[\n");
-
+        bufferSize += 21; // strlen("\t\t<testcase name=\"%s\">\n") - 2
+        bufferSize += 16; // strlen("\t\t\t<system-out>\n")
+        bufferSize += 14; // strlen("\t\t\t\t<![CDATA[\n")
         bufferSize += getSizeOfSystemOut(i);
-        bufferSize += strlen( "\t\t\t\t]]>\n\t\t\t</system-out>\n");
+        bufferSize += 25; // strlen( "\t\t\t\t]]>\n\t\t\t</system-out>\n")
         if (!(staticTestSuite.testCases[i].isPassed))
         {
-            bufferSize += strlen("\t\t\t<failure>\n");
+            bufferSize += 13; // strlen("\t\t\t<failure>\n")
             bufferSize += getSizeOfFailures(i);
-            bufferSize += strlen("\t\t\t</failure>\n");
+            bufferSize += 14; // strlen("\t\t\t</failure>\n")
         }
-        bufferSize += strlen("\t\t</testcase>\n");
+        bufferSize += 14; // strlen("\t\t</testcase>\n")
     }
-
     return bufferSize;
 }
 
@@ -141,7 +139,7 @@ unsigned int getSizeOfTestsuite()
     bufferSize += getSizeOfTestsuiteBegin();
     bufferSize += getSizeOfProperties();
     bufferSize += getSizeOfTestcases();
-    bufferSize += strlen("</testsuite>\n");
+    bufferSize += 13; // strlen("</testsuite>\n")
 
     return bufferSize;
 }
