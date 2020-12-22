@@ -261,12 +261,12 @@ void UCUNIT_XML_GetTestcase(char *xmlString, int i)
 {
     char tempBuffer[64] = { 0 };
 
-    sprintf(tempBuffer, "\t\t<testcase name=\"%s\">\n",
+    sprintf(tempBuffer, "\t<testcase name=\"%s\">\n",
             staticTestSuite.testCases[i].testCaseName);
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
     memset(tempBuffer, 0, sizeof(tempBuffer));
-    strcat(xmlString, "\t\t\t<system-out>\n");
-    strcat(xmlString, "\t\t\t\t<![CDATA[\n");
+    strcat(xmlString, "\t\t<system-out>\n");
+    strcat(xmlString, "\t\t\t<![CDATA[\n");
 
     char systemOut[getSizeOfSystemOut(i)];
     char failures[getSizeOfFailures(i)];
@@ -286,14 +286,14 @@ void UCUNIT_XML_GetTestcase(char *xmlString, int i)
         }
     }
     strncat(xmlString, systemOut, strlen(systemOut));
-    strcat(xmlString, "\t\t\t\t]]>\n\t\t\t</system-out>\n");
+    strcat(xmlString, "\t\t\t]]>\n\t\t</system-out>\n");
     if (!(staticTestSuite.testCases[i].isPassed))
     {
-        strcat(xmlString, "\t\t\t<failure>\n");
+        strcat(xmlString, "\t\t<system-err>\n");
         strncat(xmlString, failures, strlen(failures));
-        strcat(xmlString, "\t\t\t</failure>\n");
+        strcat(xmlString, "\t\t</system-err>\n");
     }
-    strcat(xmlString, "\t\t</testcase>\n");
+    strcat(xmlString, "\t</testcase>\n");
 }
 
 void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
@@ -301,7 +301,7 @@ void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
     char tempBuffer[getSizeOfCheck(i, j, result)];
     memset(tempBuffer, 0, sizeof(tempBuffer));
 
-    sprintf(tempBuffer, "\t\t\t\t%s:%s %s(%s) %s\n",
+    sprintf(tempBuffer, "\t\t\t%s:%s %s(%s) %s\n",
     staticTestSuite.testCases[i].checks[j].filePath,
     staticTestSuite.testCases[i].checks[j].lineNumber,
     staticTestSuite.testCases[i].checks[j].type,
