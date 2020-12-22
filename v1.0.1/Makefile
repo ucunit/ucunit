@@ -72,6 +72,6 @@ clean:
 	$(RM) ./$(TARGET)
 	$(RM) ./**/*.o core
 	$(RM) ./*.o core
-	$(RM) ../*.xml core
+	$(RM) ./*.xml core
 	echo 'Clean finished.'
 	

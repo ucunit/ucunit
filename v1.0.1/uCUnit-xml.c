@@ -110,7 +110,6 @@ static unsigned int getSizeOfTestcases()
 {
     unsigned int bufferSize = 0;
 
-    bufferSize += strlen("\t</testcases>\n");
     unsigned int i;
     unsigned int j;
     for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
@@ -130,7 +129,6 @@ static unsigned int getSizeOfTestcases()
         }
         bufferSize += strlen("\t\t</testcase>\n");
     }
-    bufferSize += strlen("\t</testcases>\n");
 
     return bufferSize;
 }
@@ -252,14 +250,11 @@ void UCUNIT_XML_GetProperties(char *xmlString)
 
 void UCUNIT_XML_GetTestcases(char *xmlString)
 {
-    strcat(xmlString, "\t<testcases>\n");
-
     unsigned int i;
     for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
     {
         UCUNIT_XML_GetTestcase(xmlString,i);
     }
-    strcat(xmlString, "\t</testcases>\n");
 }
 
 void UCUNIT_XML_GetTestcase(char *xmlString, int i)
@@ -332,9 +327,8 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
 
 void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
 {
-    char outputfile[strlen(staticTestSuite.filePath)+strlen("./")+3];
+    char outputfile[strlen(staticTestSuite.filePath)+3];
     memset(outputfile, 0, sizeof(outputfile));
-    strcat(outputfile, "./");
     strncat(outputfile, &staticTestSuite.filePath[0], strlen(staticTestSuite.filePath)-1);
     strcat(outputfile, "xml");
 
@@ -343,7 +337,6 @@ void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
     fp = fopen(outputfile, "w+");
     fprintf(fp, xmlString);
     fclose(fp);
-
 }
 
 #else
