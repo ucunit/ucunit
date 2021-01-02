@@ -39,9 +39,9 @@ static unsigned int getSizeOfProperties()
     bufferSize += 39; // strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n") - 2
     bufferSize += 20; // size of formatted date string
     bufferSize += 40; // strlen("\t\t<property name=\"time\" value=\"%02d:%02d:%02d\"/>\n") - 9
-    bufferSize += sizeof(staticTestSuite.time.tm_hour);
-    bufferSize += sizeof(staticTestSuite.time.tm_min);
-    bufferSize += sizeof(staticTestSuite.time.tm_sec);
+    bufferSize += 4; // sizeof(staticTestSuite.time.tm_hour)
+    bufferSize += 4; // sizeof(staticTestSuite.time.tm_min)
+    bufferSize += 4; // sizeof(staticTestSuite.time.tm_min)
     bufferSize += 45; // strlen("\t\t<property name=\"ucunit-version\" value=\"%s\"/>\n") - 2
     bufferSize += strlen(staticTestSuite.ucunitVersion);
     bufferSize += 15; // strlen("\t</properties>\n")
@@ -54,9 +54,9 @@ static unsigned int getSizeOfTestsuiteBegin()
     unsigned int bufferSize = 0;
 
     bufferSize += 52; // strlen("<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n") - 6
-    bufferSize += sizeof(ucunit_testcases_failed);
+    bufferSize += 4; // sizeof(ucunit_testcases_failed)
     bufferSize += strlen(staticTestSuite.testSuiteName);
-    bufferSize += sizeof(staticTestSuite.numOfTestCases);
+    bufferSize += 4; // sizeof(staticTestSuite.numOfTestCases)
 
     return bufferSize;
 }
