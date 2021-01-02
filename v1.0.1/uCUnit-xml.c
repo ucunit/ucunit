@@ -189,11 +189,6 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,char *f
     staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks += 1;
 }
 
-void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite *testSuite)
-{
-    //testSuite = staticTestSuite;
-}
-
 /* ----- Assembling the xml object into a string array -------------------------------------- */
 void UCUNIT_XML_GetXmlHeader(char *xmlString)
 {
@@ -287,9 +282,9 @@ void UCUNIT_XML_GetTestcase(char *xmlString, int i)
     strcat(xmlString, "\t\t\t]]>\n\t\t</system-out>\n");
     if (!(staticTestSuite.testCases[i].isPassed))
     {
-        strcat(xmlString, "\t\t<system-err>\n");
+        strcat(xmlString, "\t\t<failure>\n");
         strncat(xmlString, failures, strlen(failures));
-        strcat(xmlString, "\t\t</system-err>\n");
+        strcat(xmlString, "\t\t</failure>\n");
     }
     strcat(xmlString, "\t</testcase>\n");
 }
