@@ -264,33 +264,11 @@ void UCUNIT_XML_GetProperties(char* xmlString);
 
 /**
  * Converts the test cases into an XML string.
- * The output will have the following structure:
- *     <testcase name="[test case name]">
- *         <system-out>
- *             <![CDATA[
- *                 [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
- *                 [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
- *             ]]>
- *         </system-out>
- *         (if there's failed a check in the testcase)
- *         <failure>
- *             [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
- *             [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
- *         </failure>
- *     </testcase>
+ * Calls the UCUNIT_XML_GetTestcase method for each testcase in the static test object.
  *
  * @param [out] xmlString Pointer to the output string array.
  */
 void UCUNIT_XML_GetTestcases(char* xmlString);
-
-/**
- * Create the test suite close tag into an XML string.
- * The output will be to following:
- *     </testsuite>
- *
- * @param [out] xmlString Pointer to the output string array.
- */
-void UCUNIT_XML_GetTestsuiteClose(char *xmlString);
 
 /**
  * Calls all the methods that creates the XML string.
@@ -310,9 +288,42 @@ void UCUNIT_XML_GetXmlObject(char *xmlString);
  */
 void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
 
+/**
+ * Converts the given testacase into an XML string.
+ * The output will have the following structure:
+ *     <testcase name="[test case name]">
+ *         <system-out>
+ *             <![CDATA[
+ *                 [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *                 [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *             ]]>
+ *         </system-out>
+ *         (if there's failed a check in the testcase)
+ *         <failure>
+ *             [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *             [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *         </failure>
+ *     </testcase>
+ *
+ * @param [in] i Index of testcase.
+ * @param [out] xmlString Pointer to the output string array.
+ */
 void UCUNIT_XML_GetTestcase(char *xmlString, int i);
-void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
-unsigned int getSizeOfTestsuite();
 
+/**
+ * Writes the completed XML string to the local folder.
+ * The name of the file is generated from the testsuite file's name.
+ * Testsuite.c --> Testsuite.xml
+ *
+ * @param [in] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
+
+/**
+ * Calculates the size of the char array which contains the XML string beforehand.
+ *
+ * @param [in] xmlString Pointer to the output string array.
+ */
+unsigned int getSizeOfTestsuite();
 
 #endif /* UCUNIT_XML_H_ */
