@@ -318,7 +318,6 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
     UCUNIT_XML_GetTestsuiteBegin(xmlString);
     UCUNIT_XML_GetProperties(xmlString);
     UCUNIT_XML_GetTestcases(xmlString);
-    UCUNIT_XML_GetTestsuiteClose(xmlString);
     strcat(xmlString, "</testsuite>\n");
 }
 
