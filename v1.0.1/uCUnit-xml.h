@@ -180,7 +180,6 @@ void UCUNIT_XML_TestBegin(char* testSuiteName,  char *file);
  * Begins the next test case. Stores the test case data into the UCUNIT_XmlTestCase structure.
  * The next UCUNIT_XmlTestCase object is get from the static UCUNIT_XmlTestSuite
  * and the number of test cases is increased.
- * TODO: What should happen when there are no more available test case in the static object?
  * The following data are stored:
  *     * the test case name (testCaseName parameter)
  * The function also set the number of test checks to 0.
@@ -215,11 +214,6 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  * @param [in] line The line number of the check where it was executed.
  */
 void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line);
-
-/**
- * TODO: Create description
- */
-void UCUNIT_XML_TestSummary(int testCasesFailed, int testCasesPassed, int checksFailed, int checksPassed);
 
 /**
  * Returns with the static UCUNIT_XmlTestSuite object.
