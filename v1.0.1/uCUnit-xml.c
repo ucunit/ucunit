@@ -69,7 +69,7 @@ static unsigned int getSizeOfCheck(int i, int j, const char *result)
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].type);
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].arguments);
     bufferSize += strlen(staticTestSuite.testCases[i].checks[j].lineNumber);
-    bufferSize += strlen(staticTestSuite.testCases[i].checks[j].filePath);
+    bufferSize += strlen(staticTestSuite.filePath);
     bufferSize += strlen(result);
 
     return bufferSize;
@@ -187,7 +187,6 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,char *f
     check.isPassed = isPassed;
     check.type = type;
     check.arguments = arguments;
-    check.filePath = file;
     check.lineNumber = line;
     staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].checks[staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks] = check;
     staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks += 1;
@@ -303,7 +302,7 @@ void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
     memset(tempBuffer, 0, sizeof(tempBuffer));
 
     sprintf(tempBuffer, "\t\t\t%s:%s %s(%s) %s\n",
-    staticTestSuite.testCases[i].checks[j].filePath,
+    staticTestSuite.filePath,
     staticTestSuite.testCases[i].checks[j].lineNumber,
     staticTestSuite.testCases[i].checks[j].type,
     staticTestSuite.testCases[i].checks[j].arguments,

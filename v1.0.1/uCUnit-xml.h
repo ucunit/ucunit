@@ -132,7 +132,6 @@ typedef struct UCUNIT_XmlChecks
 {
     char* type;      			/* Pointer to the type of the check */
     bool isPassed;              /* Result of the check */
-    char* filePath;             /* Pointer to the checked test file path string */
     char* lineNumber;           /* Pointer to the checked test file line string */
     char* arguments;            /* Pointer to the check arguments string */
 } UCUNIT_XmlCheck;
