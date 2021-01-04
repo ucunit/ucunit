@@ -164,7 +164,7 @@ void UCUNIT_XML_TestcaseBegin(char *testCaseName)
     staticTestSuite.numOfTestCases += 1;
     if (staticTestSuite.numOfTestCases > MAX_NUM_OF_TEST_CASES)
     {
-        System_Shutdown();
+        exit(0);
     }
 }
 
@@ -193,7 +193,7 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,char *f
     staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks += 1;
     if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks > MAX_NUM_OF_CHECKS_PER_TESTCASE)
     {
-        System_Shutdown();
+        exit(0);
     }
 }
 
