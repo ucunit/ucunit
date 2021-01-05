@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef UCUNIT_MODE_XML
@@ -40,7 +41,7 @@
 #define UCUNIT_WritePassedMsg(msg, args)                \
     do                                                  \
     {                                                   \
-        UCUNIT_XML_CheckExecuted(true, msg, args, __FILE__, UCUNIT_DefineToString(__LINE__));      \
+        UCUNIT_XML_CheckExecuted(true, msg, args, UCUNIT_DefineToString(__LINE__));      \
     } while(0)
 
 /**
@@ -60,7 +61,7 @@
 #define UCUNIT_WriteFailedMsg(msg, args)                \
     do                                                  \
     {                                                   \
-        UCUNIT_XML_CheckExecuted(false, msg, args, __FILE__, UCUNIT_DefineToString(__LINE__));     \
+        UCUNIT_XML_CheckExecuted(false, msg, args, UCUNIT_DefineToString(__LINE__));     \
     } while(0)
 
 /**
@@ -212,7 +213,7 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  * @param [in] file The file where the check was executed.
  * @param [in] line The line number of the check where it was executed.
  */
-void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line);
+void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* line);
 
 /**
  * Returns with the static UCUNIT_XmlTestSuite object.
@@ -279,7 +280,7 @@ void UCUNIT_XML_GetXmlObject(char *xmlString);
  *
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
+void UCUNIT_XML_GetChecks(char *xmlString, uint8_t i, uint8_t j,const char *result);
 
 /**
  * Converts the given testacase into an XML string.
@@ -301,7 +302,7 @@ void UCUNIT_XML_GetChecks(char *xmlString, int i, int j,const char *result);
  * @param [in] i Index of testcase.
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestcase(char *xmlString, int i);
+void UCUNIT_XML_GetTestcase(char *xmlString, uint8_t i);
 
 /**
  * Writes the completed XML string to the local folder.
@@ -319,6 +320,6 @@ void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
  */
 
 char* UCUNIT_XML_GetTestFileName(void);
-unsigned int UCUNIT_XML_GetSizeOfTestsuite();
+size_t UCUNIT_XML_GetSizeOfTestsuite();
 
 #endif /* UCUNIT_XML_H_ */

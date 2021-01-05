@@ -7,7 +7,7 @@
 #----------------------------------------------------
 # Compiler
 CC:=gcc
-CFLAGS:=-g -Wall -Wextra -pedantic -Wconversion
+CFLAGS:= -std='c99' -g -Wall -Wextra -pedantic -Wconversion
 
 #Linker
 LD:=gcc
