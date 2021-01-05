@@ -319,20 +319,6 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
     strcat(xmlString, "</testsuite>\n");
 }
 
-void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
-{
-    char outputfile[strlen(staticTestSuite.filePath)+3];
-    memset(outputfile, 0, sizeof(outputfile));
-    strncat(outputfile, &staticTestSuite.filePath[0], strlen(staticTestSuite.filePath)-1);
-    strcat(outputfile, "xml");
-
-    FILE *fp;
-
-    fp = fopen(outputfile, "w+");
-    fprintf(fp, xmlString);
-    fclose(fp);
-}
-
 char* UCUNIT_XML_GetTestFileName(void)
 {
     return staticTestSuite.filePath;
@@ -396,10 +382,6 @@ void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
 void UCUNIT_XML_GetXmlObject(char *xmlString)
 {
 	/* Empty implementation */
-}
-void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
-{
-    /* Empty implementation */
 }
 
 unsigned int UCUNIT_XML_GetSizeOfTestsuite()

@@ -43,5 +43,6 @@ void System_Safestate(void);
 void System_Recover(void);
 void System_WriteString(char * msg);
 void System_WriteInt(int n);
+void System_WriteXMLStringToFile(char *xmlString);
 
 #endif /* SYSTEM_H_ */

@@ -303,23 +303,16 @@ void UCUNIT_XML_GetChecks(char *xmlString, uint8_t i, uint8_t j,const char *resu
  * @param [out] xmlString Pointer to the output string array.
  */
 void UCUNIT_XML_GetTestcase(char *xmlString, uint8_t i);
-
-/**
- * Writes the completed XML string to the local folder.
- * The name of the file is generated from the testsuite file's name.
- * Testsuite.c --> Testsuite.xml
- *
- * @param [in] xmlString Pointer to the output string array.
- */
-void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
-
 /**
  * Calculates the size of the char array which contains the XML string beforehand.
  *
  * @param [in] xmlString Pointer to the output string array.
  */
-
-char* UCUNIT_XML_GetTestFileName(void);
 size_t UCUNIT_XML_GetSizeOfTestsuite();
+
+/**
+ * Returns the path of the tests.
+ */
+char* UCUNIT_XML_GetTestFileName(void);
 
 #endif /* UCUNIT_XML_H_ */

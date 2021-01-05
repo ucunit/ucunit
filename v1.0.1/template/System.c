@@ -56,7 +56,7 @@ void System_Shutdown(void)
     memset(buffer, 0, sizeof(buffer));
 	UCUNIT_XML_GetXmlObject(buffer);
 	printf(buffer);
-	UCUNIT_XML_WriteXmlObjectToFile(buffer);
+	System_WriteXMLStringToFile(buffer);
 
     printf("System shutdown.\n");
     exit(0);
@@ -99,7 +99,7 @@ void System_WriteInt(int n)
 	printf("%i", n);
 }
 
-void System_WriteStringToFile(char * string)
+void System_WriteXMLStringToFile(char *xmlString)
 {
     char outputfile[strlen(UCUNIT_XML_GetTestFileName())+3];
     memset(outputfile, 0, sizeof(outputfile));
@@ -109,6 +109,6 @@ void System_WriteStringToFile(char * string)
     FILE *fp;
 
     fp = fopen(outputfile, "w+");
-    fprintf(fp, string);
+    fprintf(fp, xmlString);
     fclose(fp);
 }
