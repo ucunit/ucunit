@@ -10,7 +10,6 @@
 #include "uCUnit-xml.h"
 #include "uCUnit-v1.0.h"
 
-#define BUFFER_SIZE   256
 #define XML_VERSION "1.0"
 #define XML_ENCODING "utf-8"
 
@@ -131,7 +130,7 @@ static unsigned int getSizeOfTestcases()
     return bufferSize;
 }
 
-unsigned int getSizeOfTestsuite()
+unsigned int UCUNIT_XML_GetSizeOfTestsuite()
 {
     unsigned int bufferSize = 0;
 
@@ -334,6 +333,11 @@ void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
     fclose(fp);
 }
 
+char* UCUNIT_XML_GetTestFileName(void)
+{
+    return staticTestSuite.filePath;
+}
+
 #else
 void UCUNIT_XML_TestBegin(char* testSuitName)
 {
@@ -351,16 +355,6 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed)
 }
 
 void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* file, char* line)
-{
-    /* Empty implementation */
-}
-
-void UCUNIT_XML_TestSummary(int testCasesFailed, int testCasesPassed, int checksFailed, int checksPassed)
-{
-    /* Empty implementation */
-}
-
-void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite* test)
 {
     /* Empty implementation */
 }
@@ -389,8 +383,28 @@ void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
 {
     /* Empty implementation */
 }
+void UCUNIT_XML_GetTestcase(char *xmlString, int i)
+{
+
+}
+
+void UCUNIT_XML_GetChecks(char *xmlString, int i, int j, const char *result)
+{
+    /* Empty implementation */
+}
+
 void UCUNIT_XML_GetXmlObject(char *xmlString)
 {
 	/* Empty implementation */
 }
+void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString)
+{
+    /* Empty implementation */
+}
+
+unsigned int UCUNIT_XML_GetSizeOfTestsuite()
+{
+    return 1;
+}
+
 #endif

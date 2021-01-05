@@ -52,7 +52,7 @@ void System_Shutdown(void)
 {
 
 	/* asm("\tSTOP"); */
-    char buffer[getSizeOfTestsuite()];
+    char buffer[UCUNIT_XML_GetSizeOfTestsuite()];
     memset(buffer, 0, sizeof(buffer));
 	UCUNIT_XML_GetXmlObject(buffer);
 	printf(buffer);
@@ -97,4 +97,18 @@ void System_WriteString(char * msg)
 void System_WriteInt(int n)
 {
 	printf("%i", n);
+}
+
+void System_WriteStringToFile(char * string)
+{
+    char outputfile[strlen(UCUNIT_XML_GetTestFileName())+3];
+    memset(outputfile, 0, sizeof(outputfile));
+    strncat(outputfile, &UCUNIT_XML_GetTestFileName()[0], strlen(UCUNIT_XML_GetTestFileName())-1);
+    strcat(outputfile, "xml");
+
+    FILE *fp;
+
+    fp = fopen(outputfile, "w+");
+    fprintf(fp, string);
+    fclose(fp);
 }

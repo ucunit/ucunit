@@ -317,6 +317,8 @@ void UCUNIT_XML_WriteXmlObjectToFile(char *xmlString);
  *
  * @param [in] xmlString Pointer to the output string array.
  */
-unsigned int getSizeOfTestsuite();
+
+char* UCUNIT_XML_GetTestFileName(void);
+unsigned int UCUNIT_XML_GetSizeOfTestsuite();
 
 #endif /* UCUNIT_XML_H_ */
