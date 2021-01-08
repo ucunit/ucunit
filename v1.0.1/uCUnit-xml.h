@@ -121,8 +121,8 @@
 #endif
 
 /* TODO: Calculate the real value of this after the implementation is done. */
-#define MAX_NUM_OF_TEST_CASES            20
-#define MAX_NUM_OF_CHECKS_PER_TESTCASE   40
+#define MAX_NUM_OF_TEST_CASES            2
+#define MAX_NUM_OF_CHECKS_PER_TESTCASE   4
 
 /* ----- Structures -------------------------------------------------------- */
 
@@ -144,7 +144,8 @@ typedef struct UCUNIT_XmlTestCases
 {
   char* testCaseName;           /* Pointer to the test case name string */
   bool isPassed;                /* Result of the test case */
-  unsigned int numOfChecks;     /* Number of the used test checks */
+  uint8_t numOfChecks;          /* Number of the used test checks */
+  bool errorFlag;               /* Shows wether there are more checks than allowed */
   UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS_PER_TESTCASE];   /* Array of the test check objects */
 } UCUNIT_XmlTestCase;
 
@@ -157,7 +158,8 @@ typedef struct UCUNIT_XmlTestSuites
   char* testSuiteName;          /* Pointer to the test suite name string */
   struct tm time;				/* The time of the test suite start */
   char* ucunitVersion;        	/* Pointer to the uCUnit version string */
-  unsigned int numOfTestCases;  /* Number of the used test cases */
+  uint8_t numOfTestCases;       /* Number of the used test cases */
+  bool errorFlag;               /* Shows wether there are more testcases than allowed */
   UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES];  /* Array of the test case objects */
 } UCUNIT_XmlTestSuite;
 
@@ -314,5 +316,12 @@ size_t UCUNIT_XML_GetSizeOfTestsuite();
  * Returns the path of the tests.
  */
 char* UCUNIT_XML_GetTestFileName(void);
+
+/**
+ * Concatenates the the error to the xmlString if there's more testcases than allowed.
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString);
 
 #endif /* UCUNIT_XML_H_ */
