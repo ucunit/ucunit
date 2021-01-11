@@ -40,6 +40,20 @@
 #include "../System.h"
 #include "../uCUnit-xml.h"
 
+static void System_WriteXMLStringToFile(char *xmlString)
+{
+    char outputfile[strlen(UCUNIT_XML_GetTestFileName())+3];
+    memset(outputfile, 0, sizeof(outputfile));
+    strncat(outputfile, &UCUNIT_XML_GetTestFileName()[0], strlen(UCUNIT_XML_GetTestFileName())-1);
+    strcat(outputfile, "xml");
+
+    FILE *fp;
+
+    fp = fopen(outputfile, "w+");
+    fprintf(fp, xmlString);
+    fclose(fp);
+}
+
 /* Stub: Initialize your hardware here */
 void System_Init(void)
 {
@@ -97,18 +111,4 @@ void System_WriteString(char * msg)
 void System_WriteInt(int n)
 {
 	printf("%i", n);
-}
-
-void System_WriteXMLStringToFile(char *xmlString)
-{
-    char outputfile[strlen(UCUNIT_XML_GetTestFileName())+3];
-    memset(outputfile, 0, sizeof(outputfile));
-    strncat(outputfile, &UCUNIT_XML_GetTestFileName()[0], strlen(UCUNIT_XML_GetTestFileName())-1);
-    strcat(outputfile, "xml");
-
-    FILE *fp;
-
-    fp = fopen(outputfile, "w+");
-    fprintf(fp, xmlString);
-    fclose(fp);
 }

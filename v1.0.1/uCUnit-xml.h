@@ -120,6 +120,8 @@
 #define UCUNIT_WriteSummary()
 #endif
 
+#define UNUSED(x) (void)(x)
+
 /* TODO: Calculate the real value of this after the implementation is done. */
 #define MAX_NUM_OF_TEST_CASES            2
 #define MAX_NUM_OF_CHECKS_PER_TESTCASE   4
@@ -299,6 +301,11 @@ void UCUNIT_XML_GetChecks(char *xmlString, uint8_t i, uint8_t j,const char *resu
  *             [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
  *             [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
  *         </failure>
+ *         (if an error occured in the testcase)
+ *         <system-err>
+                   Too many checks within this testcase.The allowed amount of checks per testcase is {{MAX_NUM_OF_CHECKS_PER_TESTCASE}}
+           </system-err>
+ *
  *     </testcase>
  *
  * @param [in] i Index of testcase.
@@ -319,6 +326,16 @@ char* UCUNIT_XML_GetTestFileName(void);
 
 /**
  * Concatenates the the error to the xmlString if there's more testcases than allowed.
+ *
+ * @param [out] xmlString Pointer to the output string array.
+ */
+
+/**
+ * If there's an error regarding the testsuite, this method creates a child element in the xml object's testsuite lement.
+ * The output will have the following structure:
+ * <system-err>
+ *         Too many testcases.The allowed amount of testcases is {{MAX_NUM_OF_TEST_CASES}}
+ * </system-err>
  *
  * @param [out] xmlString Pointer to the output string array.
  */
