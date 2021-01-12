@@ -42,9 +42,12 @@
 
 static void System_WriteXMLStringToFile(char *xmlString)
 {
-    char outputfile[strlen(UCUNIT_XML_GetTestFileName())+3];
+    char filename[100] = { 0 };
+
+    GetModuleFileNameA(NULL,filename,MAX_PATH);
+    char outputfile[strlen(filename)+1];
     memset(outputfile, 0, sizeof(outputfile));
-    strncat(outputfile, &UCUNIT_XML_GetTestFileName()[0], strlen(UCUNIT_XML_GetTestFileName())-1);
+    strncat(outputfile, filename, strlen(filename)-3);
     strcat(outputfile, "xml");
 
     FILE *fp;
@@ -66,7 +69,9 @@ void System_Shutdown(void)
 {
 
 	/* asm("\tSTOP"); */
-    char buffer[UCUNIT_XML_GetSizeOfTestsuite()];
+    size_t bufferSize = 0;
+    UCUNIT_XML_GetSizeOfTestsuite(&bufferSize);
+    char buffer[bufferSize];
     memset(buffer, 0, sizeof(buffer));
 	UCUNIT_XML_GetXmlObject(buffer);
 	printf(buffer);
