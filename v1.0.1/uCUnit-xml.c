@@ -314,7 +314,7 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
 
 void UCUNIT_XML_GetTestcase(char *xmlString, uint8_t i)
 {
-    char tempBuffer[64] = { 0 };
+    char tempBuffer[100] = { 0 };
 
     sprintf(tempBuffer, "\t<testcase name=\"%s\">\n",
             staticTestSuite.testCases[i].testCaseName);
