@@ -42,7 +42,7 @@
 
 static void System_WriteXMLStringToFile(char *xmlString)
 {
-    char filename[100] = { 0 };
+    char filename[MAX_PATH] = { 0 };
 
     GetModuleFileNameA(NULL,filename,MAX_PATH);
     char outputfile[strlen(filename)+1];
