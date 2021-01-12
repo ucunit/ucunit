@@ -474,9 +474,9 @@ void UCUNIT_XML_GetXmlObject(char *xmlString)
     UNUSED(xmlString);
 }
 
-size_t UCUNIT_XML_GetSizeOfTestsuite()
+void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize)
 {
-    return 1;
+    UNUSED(bufferSize);
 }
 
 char* UCUNIT_XML_GetTestFileName(void)
