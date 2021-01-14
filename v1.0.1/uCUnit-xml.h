@@ -124,7 +124,7 @@
 #define UNUSED(x) (void)(x)
 
 /* These values are configurable. Increasing the values might use too much memory which can cause errors.*/
-#define MAX_NUM_OF_TEST_CASES            32
+#define MAX_NUM_OF_TEST_CASES            3
 #define MAX_NUM_OF_CHECKS_PER_TESTCASE   64
 
 /* ----- Structures -------------------------------------------------------- */
@@ -147,7 +147,7 @@ typedef struct UCUNIT_XmlTestCases
 {
     char *testCaseName; /* Pointer to the test case name string */
     bool isPassed; /* Result of the test case */
-    uint8_t numOfChecks; /* Number of the used test checks */
+    uint16_t numOfChecks; /* Number of the used test checks */
     bool errorFlag; /* Shows wether there are more checks than allowed */
     UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS_PER_TESTCASE]; /* Array of the test check objects */
 } UCUNIT_XmlTestCase;
@@ -161,7 +161,7 @@ typedef struct UCUNIT_XmlTestSuites
     char *testSuiteName; /* Pointer to the test suite name string */
     struct tm time; /* The time of the test suite start */
     char *ucunitVersion; /* Pointer to the uCUnit version string */
-    uint8_t numOfTestCases; /* Number of the used test cases */
+    uint16_t numOfTestCases; /* Number of the used test cases */
     bool errorFlag; /* Shows wether there are more testcases than allowed */
     UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES]; /* Array of the test case objects */
 } UCUNIT_XmlTestSuite;
@@ -286,7 +286,7 @@ void UCUNIT_XML_GetXmlObject(char *xmlString);
  *
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetChecks(char *xmlString, uint8_t i, uint8_t j,
+void UCUNIT_XML_GetChecks(char *xmlString, uint16_t i, uint16_t j,
                           const char *result);
 
 /**
@@ -315,7 +315,7 @@ void UCUNIT_XML_GetChecks(char *xmlString, uint8_t i, uint8_t j,
  * @param [result] j Pointer to the result string of the check.
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestcase(char *xmlString, uint8_t i);
+void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t i);
 /**
  * Calculates the size of the char array which contains the XML string beforehand.
  *

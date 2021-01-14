@@ -39,15 +39,17 @@
 #include <stdlib.h>
 #include "../System.h"
 #include "../uCUnit-xml.h"
+#include "../uCUnit-v1.0.h"
 
+#ifdef UCUNIT_MODE_XML
 static void System_WriteXMLStringToFile(char *xmlString)
 {
     char filename[MAX_PATH] = { 0 };
 
-    GetModuleFileNameA(NULL,filename,MAX_PATH);
-    char outputfile[strlen(filename)+1];
+    GetModuleFileNameA(NULL, filename, MAX_PATH);
+    char outputfile[strlen(filename) + 1];
     memset(outputfile, 0, sizeof(outputfile));
-    strncat(outputfile, filename, strlen(filename)-3);
+    strncat(outputfile, filename, strlen(filename) - 3);
     strcat(outputfile, "xml");
 
     FILE *fp;
@@ -56,27 +58,29 @@ static void System_WriteXMLStringToFile(char *xmlString)
     fprintf(fp, xmlString);
     fclose(fp);
 }
+#endif
 
 /* Stub: Initialize your hardware here */
 void System_Init(void)
 {
 
-	printf("Init of hardware finished.\n");
+    printf("Init of hardware finished.\n");
 }
 
 /* Stub: Shutdown your hardware here */
 void System_Shutdown(void)
 {
 
-	/* asm("\tSTOP"); */
+    /* asm("\tSTOP"); */
+#ifdef UCUNIT_MODE_XML
     size_t bufferSize = 0;
     UCUNIT_XML_GetSizeOfTestsuite(&bufferSize);
     char buffer[bufferSize];
     memset(buffer, 0, sizeof(buffer));
-	UCUNIT_XML_GetXmlObject(buffer);
-	printf(buffer);
-	System_WriteXMLStringToFile(buffer);
-
+    UCUNIT_XML_GetXmlObject(buffer);
+    printf(buffer);
+    System_WriteXMLStringToFile(buffer);
+#endif
     printf("System shutdown.\n");
     exit(0);
 }
@@ -84,36 +88,36 @@ void System_Shutdown(void)
 /* Stub: Recover your system from a safe state. */
 void System_Recover(void)
 {
-	/* Stub: Recover the hardware */
-	/* asm("\tRESET"); */
-	printf("System recover.\n");
-	exit(0);
+    /* Stub: Recover the hardware */
+    /* asm("\tRESET"); */
+    printf("System recover.\n");
+    exit(0);
 }
 
 /* Stub: Put system in a safe state */
 void System_Safestate(void)
 {
-	/* Disable all port pins */
-	/* PORTA = 0x0000; */
-	/* PORTB = 0x0000; */
-	/* PORTC = 0x0000; */
+    /* Disable all port pins */
+    /* PORTA = 0x0000; */
+    /* PORTB = 0x0000; */
+    /* PORTC = 0x0000; */
 
-	/* Disable interrupts */
-	/* DIE(); */
+    /* Disable interrupts */
+    /* DIE(); */
 
-	/* Put processor into idle state */
-	/* asm("\tIDLE"); */
-	printf("System safe state.\n");
-	exit(0);
+    /* Put processor into idle state */
+    /* asm("\tIDLE"); */
+    printf("System safe state.\n");
+    exit(0);
 }
 
 /* Stub: Write a string to the host/debugger/simulator */
-void System_WriteString(char * msg)
+void System_WriteString(char *msg)
 {
-	printf(msg);
+    printf(msg);
 }
 
 void System_WriteInt(int n)
 {
-	printf("%i", n);
+    printf("%i", n);
 }
