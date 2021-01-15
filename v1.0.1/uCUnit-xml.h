@@ -124,7 +124,7 @@
 #define UNUSED(x) (void)(x)
 
 /* These values are configurable. Increasing the values might use too much memory which can cause errors.*/
-#define MAX_NUM_OF_TEST_CASES            3
+#define MAX_NUM_OF_TEST_CASES            32
 #define MAX_NUM_OF_CHECKS_PER_TESTCASE   64
 
 /* ----- Structures -------------------------------------------------------- */

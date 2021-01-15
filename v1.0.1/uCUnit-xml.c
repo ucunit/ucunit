@@ -229,15 +229,16 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed)
 void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,
                               char *line)
 {
-    if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].errorFlag || staticTestSuite.errorFlag)
+    if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].errorFlag
+            || staticTestSuite.errorFlag)
     {
         return;
     }
     if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks
-                == MAX_NUM_OF_CHECKS_PER_TESTCASE-1)
+            == MAX_NUM_OF_CHECKS_PER_TESTCASE - 1)
     {
         staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].errorFlag =
-                true;
+        true;
     }
     UCUNIT_XmlCheck check;
     check.isPassed = isPassed;
