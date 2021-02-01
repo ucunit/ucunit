@@ -163,7 +163,7 @@ static size_t getSizeOfTestcases()
             bufferSize += 11;    //strlen("\t\t</error\n")
         }
         bufferSize += 14;        // strlen("\t\t</testcase>\n")
-        firstTestcaseCheckIndex += testcases[testcaseIndex].numberOfChecks;
+        firstTestcaseCheckIndex = (uint16_t) (testcases[testcaseIndex].numberOfChecks + firstTestcaseCheckIndex);
     }
     return bufferSize;
 }
@@ -348,8 +348,7 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
     {
         UCUNIT_XML_GetTestcase(xmlString, testcaseIndex,
                                firstTestcaseCheckIndex);
-        firstTestcaseCheckIndex +=
-                (uint16_t) testcases[testcaseIndex].numberOfChecks;
+        firstTestcaseCheckIndex = (uint16_t) (testcases[testcaseIndex].numberOfChecks + firstTestcaseCheckIndex);
     }
 }
 
