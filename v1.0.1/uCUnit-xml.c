@@ -26,6 +26,8 @@ int ucunit_index = 0; /* Tracepoint index */
 /* ----- Functions --------------------------------------------------------- */
 #ifdef UCUNIT_MODE_XML
 static UCUNIT_XmlTestSuite staticTestSuite;
+static UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS];
+static UCUNIT_XmlTestCase testcases[MAX_NUM_OF_TEST_CASES];
 
 /* ----- Buffer size calculation for the xml string array ------------------ */
 static size_t getSizeOfHeader()
@@ -47,9 +49,9 @@ static size_t getSizeOfProperties()
     bufferSize += 39; // strlen("\t\t<property name=\"compiled\" value=\"%s\"/>\n") - 2
     bufferSize += 20;   // size of formatted date string
     bufferSize += 40; // strlen("\t\t<property name=\"time\" value=\"%02d:%02d:%02d\"/>\n") - 9
-    bufferSize += 4;    // sizeof(staticTestSuite.time.tm_hour)
-    bufferSize += 4;    // sizeof(staticTestSuite.time.tm_min)
-    bufferSize += 4;    // sizeof(staticTestSuite.time.tm_min)
+    bufferSize += sizeof(staticTestSuite.time.tm_hour);
+    bufferSize += sizeof(staticTestSuite.time.tm_min);
+    bufferSize += sizeof(staticTestSuite.time.tm_min);
     bufferSize += 45; // strlen("\t\t<property name=\"ucunit-version\" value=\"%s\"/>\n") - 2
     bufferSize += strlen(staticTestSuite.ucunitVersion);
     bufferSize += 15;   // strlen("\t</properties>\n")
@@ -62,55 +64,67 @@ static size_t getSizeOfTestsuiteBegin()
     size_t bufferSize = 0;
 
     bufferSize += 50; // strlen("<testsuite errors=\"%d\" failures=\"%d\" name=\"%s\" tests=\"%d\">\n") - 8
-    bufferSize += 4;  // sizeof(ucunit_testcases_failed)
+    bufferSize += sizeof(ucunit_testcases_failed);
     bufferSize += strlen(staticTestSuite.testSuiteName);
-    bufferSize += 4;  // sizeof(staticTestSuite.numOfTestCases)
-    bufferSize += 2;  //sizeof(uint16_t)
+    bufferSize += sizeof(staticTestSuite.numOfTestCases);
+    bufferSize += sizeof(uint16_t);
 
     return bufferSize;
 }
 
-static size_t getSizeOfCheck(uint16_t i, uint16_t j, size_t fileNameLength,
+static size_t getSizeOfCheck(uint16_t checkIndex, size_t fileNameLength,
                              const char *result)
 {
     size_t bufferSize = 0;
 
     bufferSize += 10;   // strlen("\t\t\t\t%s:%s %s(%s) %s\n") - 10
-    bufferSize += strlen(staticTestSuite.testCases[i].checks[j].type);
-    bufferSize += strlen(staticTestSuite.testCases[i].checks[j].arguments);
-    bufferSize += strlen(staticTestSuite.testCases[i].checks[j].lineNumber);
+    bufferSize += strlen(checks[checkIndex].type);
+    bufferSize += strlen(checks[checkIndex].arguments);
+    bufferSize += strlen(checks[checkIndex].lineNumber);
     bufferSize += fileNameLength;
     bufferSize += strlen(result);
 
     return bufferSize;
 }
 
-static size_t getSizeOfSystemOut(uint16_t i, size_t fileNameLength)
+static size_t getSizeOfSystemOut(uint16_t testcaseIndex,
+                                 uint16_t firstTestcaseCheckIndex,
+                                 size_t fileNameLength)
 {
     size_t bufferSize = 0;
 
-    uint16_t j;
-    for (j = 0; j < staticTestSuite.testCases[i].numOfChecks; ++j)
+    uint16_t checkIndex;
+    for (checkIndex = firstTestcaseCheckIndex;
+            checkIndex
+                    < firstTestcaseCheckIndex
+                            + testcases[testcaseIndex].numberOfChecks;
+            ++checkIndex)
     {
-        if ((staticTestSuite.testCases[i].checks[j].isPassed))
+        if ((checks[checkIndex].isPassed))
         {
             bufferSize += 1;   // strlen("\t")
-            bufferSize += getSizeOfCheck(i, j, fileNameLength, "passed");
+            bufferSize += getSizeOfCheck(checkIndex, fileNameLength, "passed");
         }
     }
     return bufferSize;
 }
 
-static size_t getSizeOfFailures(uint16_t i, size_t fileNameLength)
+static size_t getSizeOfFailures(uint16_t testcaseIndex,
+                                uint16_t firstTestcaseCheckIndex,
+                                size_t fileNameLength)
 {
     size_t bufferSize = 0;
 
-    uint16_t j;
-    for (j = 0; j < staticTestSuite.testCases[i].numOfChecks; ++j)
+    uint16_t checkIndex;
+    for (checkIndex = firstTestcaseCheckIndex;
+            checkIndex
+                    < firstTestcaseCheckIndex
+                            + testcases[testcaseIndex].numberOfChecks;
+            ++checkIndex)
     {
-        if (!(staticTestSuite.testCases[i].checks[j].isPassed))
+        if (!(checks[checkIndex].isPassed))
         {
-            bufferSize += getSizeOfCheck(i, j, fileNameLength, "failed");
+            bufferSize += getSizeOfCheck(checkIndex, fileNameLength, "failed");
         }
     }
     return bufferSize;
@@ -121,29 +135,35 @@ static size_t getSizeOfTestcases()
     size_t bufferSize = 0;
     size_t fileNameLength = strlen(staticTestSuite.filePath);
 
-    uint16_t i;
-    for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
+    uint16_t testcaseIndex;
+    uint16_t firstTestcaseCheckIndex;
+    for (testcaseIndex = 0; testcaseIndex < staticTestSuite.numOfTestCases;
+            ++testcaseIndex)
     {
-        bufferSize += strlen(staticTestSuite.testCases[i].testCaseName);
+        bufferSize += strlen(testcases[testcaseIndex].testCaseName);
         bufferSize += 21;        // strlen("\t\t<testcase name=\"%s\">\n") - 2
         bufferSize += 16;        // strlen("\t\t\t<system-out>\n")
         bufferSize += 14;        // strlen("\t\t\t\t<![CDATA[\n")
-        bufferSize += getSizeOfSystemOut(i, fileNameLength);
+        bufferSize += getSizeOfSystemOut(testcaseIndex, firstTestcaseCheckIndex,
+                                         fileNameLength);
         bufferSize += 25;       // strlen( "\t\t\t\t]]>\n\t\t\t</system-out>\n")
-        if (!(staticTestSuite.testCases[i].isPassed))
+        if (!(testcases[testcaseIndex].isPassed))
         {
             bufferSize += 13;    // strlen("\t\t\t<failure>\n")
-            bufferSize += getSizeOfFailures(i, fileNameLength);
+            bufferSize += getSizeOfFailures(testcaseIndex,
+                                            firstTestcaseCheckIndex,
+                                            fileNameLength);
             bufferSize += 14;    // strlen("\t\t\t</failure>\n")
         }
-        if (staticTestSuite.testCases[i].errorFlag)
+        if (testcases[testcaseIndex].errorFlag)
         {
-            bufferSize += 15;    //strlen("\t\t<system-err>\n")
+            bufferSize += 10;    //strlen("\t\t<error>\n")
             bufferSize += 65; //strlen("\t\t\tToo many checks.The allowed amount of checks per testcase is %d\n") - 2
-            bufferSize += 4;     //sizeof(MAX_NUM_OF_CHECKS_PER_TESTCASE)
-            bufferSize += 16;    //strlen("\t\t</system-err>\n")
+            bufferSize += sizeof(MAX_NUM_OF_CHECKS);
+            bufferSize += 11;    //strlen("\t\t</error\n")
         }
         bufferSize += 14;        // strlen("\t\t</testcase>\n")
+        firstTestcaseCheckIndex += testcases[testcaseIndex].numberOfChecks;
     }
     return bufferSize;
 }
@@ -157,10 +177,10 @@ void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize)
     *bufferSize += getSizeOfTestcases();
     if (staticTestSuite.errorFlag)
     {
-        *bufferSize += 15;    //strlen("\t\t<system-err>\n")
+        *bufferSize += 10;    //strlen("\t\t<error>\n")
         *bufferSize += 71; // strlen("\t\tToo many testcases.The allowed amount of testcases per testsuite is %d\n") - 2
-        *bufferSize += 4;     //sizeof(MAX_NUM_OF_TEST_CASES)
-        *bufferSize += 16;    //strlen("\t\t</system-err>\n")
+        *bufferSize += sizeof(MAX_NUM_OF_TEST_CASES);
+        *bufferSize += 11;    //strlen("\t\t</error>\n")
     }
     *bufferSize += 13; // strlen("</testsuite>\n")
 }
@@ -173,10 +193,11 @@ static uint16_t getNumberOfErrors()
     {
         numberOfErrors++;
     }
-    uint16_t i;
-    for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
+    uint16_t testcaseIndex;
+    for (testcaseIndex = 0; testcaseIndex < staticTestSuite.numOfTestCases;
+            ++testcaseIndex)
     {
-        if (staticTestSuite.testCases[i].errorFlag)
+        if (testcases[testcaseIndex].errorFlag)
         {
             numberOfErrors++;
         }
@@ -207,38 +228,38 @@ void UCUNIT_XML_TestcaseBegin(char *testCaseName)
     UCUNIT_XmlTestCase testcase;
     testcase.errorFlag = false;
     testcase.testCaseName = testCaseName;
-    testcase.numOfChecks = 0;
-    staticTestSuite.testCases[staticTestSuite.numOfTestCases] = testcase;
+    testcase.numberOfChecks = 0;
+    testcases[staticTestSuite.numOfTestCases] = testcase;
     staticTestSuite.numOfTestCases++;
 }
 
 void UCUNIT_XML_TestcaseEnd(bool isPassed)
 {
-    staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].isPassed =
-            isPassed;
-    if ((isPassed))
+    if ((ucunit_testcases_failed + ucunit_testcases_passed
+            < MAX_NUM_OF_TEST_CASES))
     {
-        ucunit_testcases_passed++;
-    }
-    else
-    {
-        ucunit_testcases_failed++;
+        testcases[staticTestSuite.numOfTestCases - 1].isPassed = isPassed;
+        if ((isPassed))
+        {
+            ucunit_testcases_passed++;
+        }
+        else
+        {
+            ucunit_testcases_failed++;
+        }
     }
 }
 
 void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,
                               char *line)
 {
-    if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].errorFlag
-            || staticTestSuite.errorFlag)
+    if (staticTestSuite.errorFlag)
     {
         return;
     }
-    if (staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks
-            == MAX_NUM_OF_CHECKS_PER_TESTCASE - 1)
+    if (staticTestSuite.numOfChecks == MAX_NUM_OF_CHECKS - 1)
     {
-        staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].errorFlag =
-        true;
+        staticTestSuite.errorFlag = true;
     }
     UCUNIT_XmlCheck check;
     check.isPassed = isPassed;
@@ -246,12 +267,26 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,
     check.arguments = arguments;
     check.lineNumber = line;
 
-    staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].checks[staticTestSuite.testCases[staticTestSuite.numOfTestCases
-            - 1].numOfChecks] = check;
-    staticTestSuite.testCases[staticTestSuite.numOfTestCases - 1].numOfChecks++;
+    checks[staticTestSuite.numOfChecks] = check;
+    staticTestSuite.numOfChecks++;
+    testcases[staticTestSuite.numOfTestCases - 1].numberOfChecks++;
 }
 
-/* ----- Assembling the xml object into a string array -------------------------------------- */
+/* ----- Assembling the xml obcheckIndexect into a string array -------------------------------------- */
+
+void UCUNIT_XML_GetXmlObject(char *xmlString)
+{
+    UCUNIT_XML_GetXmlHeader(xmlString);
+    UCUNIT_XML_GetTestsuiteBegin(xmlString);
+    UCUNIT_XML_GetProperties(xmlString);
+    UCUNIT_XML_GetTestcases(xmlString);
+    if (staticTestSuite.errorFlag)
+    {
+        UCUNIT_XML_GetTestsuiteError(xmlString);
+    }
+    strcat(xmlString, "</testsuite>\n");
+}
+
 void UCUNIT_XML_GetXmlHeader(char *xmlString)
 {
     char tempBuffer[getSizeOfHeader()];
@@ -306,105 +341,103 @@ void UCUNIT_XML_GetProperties(char *xmlString)
 
 void UCUNIT_XML_GetTestcases(char *xmlString)
 {
-    uint16_t i;
-    for (i = 0; i < staticTestSuite.numOfTestCases; ++i)
+    uint16_t testcaseIndex;
+    uint16_t firstTestcaseCheckIndex;
+    for (testcaseIndex = 0; testcaseIndex < staticTestSuite.numOfTestCases;
+            ++testcaseIndex)
     {
-        UCUNIT_XML_GetTestcase(xmlString, i);
+        UCUNIT_XML_GetTestcase(xmlString, testcaseIndex,
+                               firstTestcaseCheckIndex);
+        firstTestcaseCheckIndex +=
+                (uint16_t) testcases[testcaseIndex].numberOfChecks;
     }
 }
 
-void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t i)
+void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex,
+                            uint16_t firstTestcaseCheckIndex)
 {
     char tempBuffer[100] = { 0 };
 
     sprintf(tempBuffer, "\t<testcase name=\"%s\">\n",
-            staticTestSuite.testCases[i].testCaseName);
+            testcases[testcaseIndex].testCaseName);
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
     memset(tempBuffer, 0, sizeof(tempBuffer));
     strcat(xmlString, "\t\t<system-out>\n");
     strcat(xmlString, "\t\t\t<![CDATA[\n");
 
-    char systemOut[getSizeOfSystemOut(i, strlen(staticTestSuite.filePath))];
-    char failures[getSizeOfFailures(i, strlen(staticTestSuite.filePath))];
+    char systemOut[getSizeOfSystemOut(testcaseIndex, firstTestcaseCheckIndex,
+                                      strlen(staticTestSuite.filePath))];
+    char failures[getSizeOfFailures(testcaseIndex, firstTestcaseCheckIndex,
+                                    strlen(staticTestSuite.filePath))];
     memset(systemOut, 0, sizeof(systemOut));
     memset(failures, 0, sizeof(failures));
 
-    uint16_t j;
-    for (j = 0; j < staticTestSuite.testCases[i].numOfChecks; ++j)
+    uint16_t checkIndex;
+    for (checkIndex = firstTestcaseCheckIndex;
+            checkIndex
+                    < firstTestcaseCheckIndex
+                            + testcases[testcaseIndex].numberOfChecks;
+            ++checkIndex)
     {
-        if ((staticTestSuite.testCases[i].checks[j].isPassed))
+        if ((checks[checkIndex].isPassed))
         {
             strcat(systemOut, "\t");
-            UCUNIT_XML_GetChecks(systemOut, i, j, "passed");
+            UCUNIT_XML_GetCheck(systemOut, checkIndex, "passed");
         }
         else
         {
-            UCUNIT_XML_GetChecks(failures, i, j, "failed");
+            UCUNIT_XML_GetCheck(failures, checkIndex, "failed");
         }
     }
 
     strncat(xmlString, systemOut, strlen(systemOut));
     strcat(xmlString, "\t\t\t]]>\n\t\t</system-out>\n");
-    if (!(staticTestSuite.testCases[i].isPassed)
-            && getSizeOfFailures(i, strlen(staticTestSuite.filePath) != 0))
+    if (!(testcases[testcaseIndex].isPassed)
+            && getSizeOfFailures(testcaseIndex, firstTestcaseCheckIndex,
+                                 strlen(staticTestSuite.filePath) != 0))
     {
         strcat(xmlString, "\t\t<failure>\n");
         strncat(xmlString, failures, strlen(failures));
         strcat(xmlString, "\t\t</failure>\n");
     }
-
-    if (staticTestSuite.testCases[i].errorFlag)
-    {
-        strcat(xmlString, "\t\t<system-err>\n");
-        sprintf(tempBuffer,
-                "\t\t\tToo many checks within this testcase.The allowed amount of checks per testcase is %d\n",
-                MAX_NUM_OF_CHECKS_PER_TESTCASE);
-        strncat(xmlString, tempBuffer, strlen(tempBuffer));
-        memset(tempBuffer, 0, sizeof(tempBuffer));
-        strcat(xmlString, "\t\t</system-err>\n");
-    }
     strcat(xmlString, "\t</testcase>\n");
 }
 
-void UCUNIT_XML_GetChecks(char *xmlString, uint16_t i, uint16_t j,
-                          const char *result)
+void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
+                         const char *result)
 {
-    char tempBuffer[getSizeOfCheck(i, j, strlen(staticTestSuite.filePath),
+    char tempBuffer[getSizeOfCheck(checkIndex, strlen(staticTestSuite.filePath),
                                    result)];
     memset(tempBuffer, 0, sizeof(tempBuffer));
 
     sprintf(tempBuffer, "\t\t\t%s:%s %s(%s) %s\n", staticTestSuite.filePath,
-            staticTestSuite.testCases[i].checks[j].lineNumber,
-            staticTestSuite.testCases[i].checks[j].type,
-            staticTestSuite.testCases[i].checks[j].arguments, result);
+            checks[checkIndex].lineNumber, checks[checkIndex].type,
+            checks[checkIndex].arguments, result);
 
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
 }
 
-void UCUNIT_XML_GetXmlObject(char *xmlString)
+void UCUNIT_XML_GetTestsuiteError(char *xmlString)
 {
-    UCUNIT_XML_GetXmlHeader(xmlString);
-    UCUNIT_XML_GetTestsuiteBegin(xmlString);
-    UCUNIT_XML_GetProperties(xmlString);
-    UCUNIT_XML_GetTestcases(xmlString);
-    if (staticTestSuite.errorFlag)
+    char tempBuffer[150] = { 0 };
+
+    strcat(xmlString, "\t<error>\n");
+
+    if (staticTestSuite.numOfChecks == MAX_NUM_OF_CHECKS)
     {
-        UCUNIT_XML_GetTestsuiteSystemErr(xmlString);
+        sprintf(tempBuffer,
+                "\t\tToo many checks.The allowed amount of checks is %d\n",
+                MAX_NUM_OF_CHECKS);
     }
-    strcat(xmlString, "</testsuite>\n");
-}
-
-void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString)
-{
-    char tempBuffer[100] = { 0 };
-
-    strcat(xmlString, "\t<system-err>\n");
-    sprintf(tempBuffer,
-            "\t\tToo many testcases.The allowed amount of testcases is %d\n",
-            MAX_NUM_OF_TEST_CASES);
+    if (staticTestSuite.numOfTestCases == MAX_NUM_OF_TEST_CASES)
+    {
+        sprintf(tempBuffer,
+                "\t\tToo many testcases.The allowed amount of testcases is %d\n",
+                MAX_NUM_OF_TEST_CASES);
+    }
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
     memset(tempBuffer, 0, sizeof(tempBuffer));
-    strcat(xmlString, "\t</system-err>\n");
+    strcat(xmlString, "\t</error>\n");
 }
 
 #else
@@ -432,6 +465,11 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char* type, char* arguments, char* 
     UNUSED(line);
 }
 
+void UCUNIT_XML_GetXmlObcheckIndexect(char *xmlString)
+{
+    UNUSED(xmlString);
+}
+
 void UCUNIT_XML_GetXmlHeader(char* xmlString)
 {
     UNUSED(xmlString);
@@ -452,25 +490,22 @@ void UCUNIT_XML_GetTestcases(char* xmlString)
     UNUSED(xmlString);
 }
 
-void UCUNIT_XML_GetTestsuiteClose(char *xmlString)
+void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex, uint16_t firstTestcaseCheckIndex)
 {
     UNUSED(xmlString);
-}
-void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t i)
-{
-    UNUSED(xmlString);
-    UNUSED(i);
+    UNUSED(testcaseIndex);
+    UNUSED(firstTestcaseCheckIndex);
 }
 
-void UCUNIT_XML_GetChecks(char *xmlString, uint16_t i, uint16_t j,const char *result)
+void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
+                          const char *result)
 {
     UNUSED(xmlString);
-    UNUSED(i);
-    UNUSED(j);
+    UNUSED(checkIndex);
     UNUSED(result);
 }
 
-void UCUNIT_XML_GetXmlObject(char *xmlString)
+void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString)
 {
     UNUSED(xmlString);
 }
@@ -486,8 +521,4 @@ char* UCUNIT_XML_GetTestFileName(void)
     return ret;
 }
 
-void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString)
-{
-    UNUSED(xmlString);
-}
 #endif

@@ -124,8 +124,8 @@
 #define UNUSED(x) (void)(x)
 
 /* These values are configurable. Increasing the values might use too much memory which can cause errors.*/
-#define MAX_NUM_OF_TEST_CASES            32
-#define MAX_NUM_OF_CHECKS_PER_TESTCASE   64
+#define MAX_NUM_OF_TEST_CASES   32
+#define MAX_NUM_OF_CHECKS       32*64
 
 /* ----- Structures -------------------------------------------------------- */
 
@@ -147,9 +147,8 @@ typedef struct UCUNIT_XmlTestCases
 {
     char *testCaseName; /* Pointer to the test case name string */
     bool isPassed; /* Result of the test case */
-    uint16_t numOfChecks; /* Number of the used test checks */
+    uint16_t numberOfChecks; /* Number of the used test checks */
     bool errorFlag; /* Shows wether there are more checks than allowed */
-    UCUNIT_XmlCheck checks[MAX_NUM_OF_CHECKS_PER_TESTCASE]; /* Array of the test check objects */
 } UCUNIT_XmlTestCase;
 
 /**
@@ -162,8 +161,8 @@ typedef struct UCUNIT_XmlTestSuites
     struct tm time; /* The time of the test suite start */
     char *ucunitVersion; /* Pointer to the uCUnit version string */
     uint16_t numOfTestCases; /* Number of the used test cases */
+    uint16_t numOfChecks; /* Total number of the used test checks */
     bool errorFlag; /* Shows wether there are more testcases than allowed */
-    UCUNIT_XmlTestCase testCases[MAX_NUM_OF_TEST_CASES]; /* Array of the test case objects */
 } UCUNIT_XmlTestSuite;
 
 /* ----- Prototypes -------------------------------------------------------- */
@@ -174,6 +173,7 @@ typedef struct UCUNIT_XmlTestSuites
  *     * the test suite name (testSuiteName parameter)
  *     * the start time of the test suite
  *     * the uCUnit version
+ *     * the path of the testfile
  * The function also set the number of test cases to 0.
  *
  * @param [in] testSuiteName Pointer to the test suite name.
@@ -182,20 +182,25 @@ typedef struct UCUNIT_XmlTestSuites
 void UCUNIT_XML_TestBegin(char *testSuiteName, char *file);
 
 /**
- * Begins the next test case. Stores the test case data into the UCUNIT_XmlTestCase structure.
- * The next UCUNIT_XmlTestCase object is get from the static UCUNIT_XmlTestSuite
- * and the number of test cases is increased.
+ * Begins the next test case. Stores the test case data into a UCUNIT_XmlTestCase structure.
+ * The UCUNIT_XmlTestCase object is put into a UCUNIT_XmlTestCase array.
+ * and the number of test cases is increased after the testcase is stored.
  * The following data are stored:
  *     * the test case name (testCaseName parameter)
- * The function also set the number of test checks to 0.
+ * The function also sets the:
+ *     * number of test checks to 0
+ *     * error flag to false
+ * Also determines wether there's an error regarding the number of testcases.
+ *     * If an error occured, it sets the static UCUNIT_XmlTestSuite object's erroflag to true.
+ *     * If there's an error we exit the function.
  *
  * @param [in] testSuiteName Pointer to the test case name.
  */
 void UCUNIT_XML_TestcaseBegin(char *testCaseName);
 
 /**
- * Ends the actual test case. Stores the result into the UCUNIT_XmlTestCase structure.
- * The actual UCUNIT_XmlTestCase object is get from the static UCUNIT_XmlTestSuite.
+ * Ends the actual test case. Stores the result of the testcase into the UCUNIT_XmlTestCase structure.
+ * Increased the number of passed/failed testacases if conditions are met.
  *
  * @param [in] isPassed Result of the test case.
  */
@@ -209,24 +214,26 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  *     * the check result (isPassed parameter)
  *     * the check type (maps the type parameter from string to UCUNIT_CheckType)
  *     * the check arguments (arguments parameter)
- *     * the checked file path string
  *     * the checked file line string
+ * Also determines wether there's an error regarding the number of checks within a testcase.
+ *     * If an error occured, it sets the static UCUNIT_XmlTestSuite object's erroflag true.
+ *     * If the static UCUNIT_XmlTestSuite object's erroflag is true, we exit the function.
  *
  * @param [in] isPassed Result of the test case.
  * @param [in] type Pointer to the check's type string.
  * @param [in] arguments Pointer to the check's arguments.
- * @param [in] file The file where the check was executed.
  * @param [in] line The line number of the check where it was executed.
  */
 void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,
                               char *line);
 
 /**
- * Returns with the static UCUNIT_XmlTestSuite object.
+ * Calls all the methods that creates the XML string.
+ * The output will be the complete XML string.
  *
- * @param [out] testSuite Pointer to the output test suite object.
+ * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestsuite(UCUNIT_XmlTestSuite *testSuite);
+void UCUNIT_XML_GetXmlObject(char *xmlString);
 
 /**
  * Create the header meta-data part of the an XML file.
@@ -271,25 +278,6 @@ void UCUNIT_XML_GetProperties(char *xmlString);
 void UCUNIT_XML_GetTestcases(char *xmlString);
 
 /**
- * Calls all the methods that creates the XML string.
- * The output will be the complete XML string.
- *
- * @param [out] xmlString Pointer to the output string array.
- */
-void UCUNIT_XML_GetXmlObject(char *xmlString);
-
-/**
- * Converts the test checks into an XML string.
- * The output will have the following structure:
- *     [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
- *     [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
- *
- * @param [out] xmlString Pointer to the output string array.
- */
-void UCUNIT_XML_GetChecks(char *xmlString, uint16_t i, uint16_t j,
-                          const char *result);
-
-/**
  * Converts the given testacase into an XML string.
  * The output will have the following structure:
  *     <testcase name="[test case name]">
@@ -304,18 +292,27 @@ void UCUNIT_XML_GetChecks(char *xmlString, uint16_t i, uint16_t j,
  *             [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
  *             [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
  *         </failure>
- *         (if an error occured in the testcase)
- *         <system-err>
- *                 Too many checks within this testcase.The allowed amount of checks per testcase is {{MAX_NUM_OF_CHECKS_PER_TESTCASE}}
- *         </system-err>
  *     </testcase>
  *
- * @param [in] i Index of testcase.
- * @param [in] j Index of check in a testcase.
- * @param [result] j Pointer to the result string of the check.
+ * @param [in] i The index of the currently used testcase.
+ * @param [in] firstTestcaseCheckIndex The index of the first check from the current testcase.
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t i);
+void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex,
+                            uint16_t firstTestcaseCheckIndex);
+
+/**
+ * Converts a test check into an XML string.
+ * The output will have the following structure:
+ *     [file path]:[line] [check1 type]([check1 arguments]) [check1 result]
+ *     [file path]:[line] [check2 type]([check2 arguments]) [check2 result]
+ *
+ * @param [in] j The index of the current check.
+ * @param [out] xmlString Pointer to the output string array.
+ */
+void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
+                         const char *result);
+
 /**
  * Calculates the size of the char array which contains the XML string beforehand.
  *
@@ -326,12 +323,16 @@ void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize);
 /**
  * If there's an error regarding the testsuite, this method creates a child element in the xml object's testsuite lement.
  * The output will have the following structure:
- * <system-err>
+ * <error>
+ *         (if there're too many testcases)
  *         Too many testcases.The allowed amount of testcases is {{MAX_NUM_OF_TEST_CASES}}
- * </system-err>
+ *         (if there're too many checks)
+ *         Too many checks.The allowed amount of checks is {{MAX_NUM_OF_CHECKS}}
+ *
+ * </error>
  *
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString);
+void UCUNIT_XML_GetTestsuiteError(char *xmlString);
 
 #endif /* UCUNIT_XML_H_ */

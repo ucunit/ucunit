@@ -27,7 +27,6 @@ TARGET:=Testsuite
 
 # Sourcefiles
 SRCS:=           \
-./System.c       \
 ./Testsuite.c   \
 ./uCUnit-xml.c	\
 
