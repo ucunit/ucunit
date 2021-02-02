@@ -132,6 +132,13 @@
 /**
  * Contains information and result data of a uCUnit test check
  */
+
+typedef enum UCUNIT_ErrorTypes
+{
+    UCUNIT_ErrorTypeNoError = 0,
+    UCUNIT_ErrorTypeTooManyTestCases = 1,
+    UCUNIT_ErrorTypeTooManyChecks = 2
+} UCUNIT_ErrorType;
 typedef struct UCUNIT_XmlChecks
 {
     char *type; /* Pointer to the type of the check */
@@ -148,7 +155,6 @@ typedef struct UCUNIT_XmlTestCases
     char *testCaseName; /* Pointer to the test case name string */
     bool isPassed; /* Result of the test case */
     uint16_t numberOfChecks; /* Number of the used test checks */
-    bool errorFlag; /* Shows wether there are more checks than allowed */
 } UCUNIT_XmlTestCase;
 
 /**
@@ -162,7 +168,8 @@ typedef struct UCUNIT_XmlTestSuites
     char *ucunitVersion; /* Pointer to the uCUnit version string */
     uint16_t numOfTestCases; /* Number of the used test cases */
     uint16_t numOfChecks; /* Total number of the used test checks */
-    bool errorFlag; /* Shows wether there are more testcases than allowed */
+    bool errorFlag; /* Shows whether there are more testcases than allowed */
+    UCUNIT_ErrorType errorType; /* Shows the type of the error if there's any */
 } UCUNIT_XmlTestSuite;
 
 /* ----- Prototypes -------------------------------------------------------- */
@@ -319,20 +326,5 @@ void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
  * @param [out] bufferSize Pointer to the calculated size of the xmlString.
  */
 void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize);
-
-/**
- * If there's an error regarding the testsuite, this method creates a child element in the xml object's testsuite lement.
- * The output will have the following structure:
- * <error>
- *         (if there're too many testcases)
- *         Too many testcases.The allowed amount of testcases is {{MAX_NUM_OF_TEST_CASES}}
- *         (if there're too many checks)
- *         Too many checks.The allowed amount of checks is {{MAX_NUM_OF_CHECKS}}
- *
- * </error>
- *
- * @param [out] xmlString Pointer to the output string array.
- */
-void UCUNIT_XML_GetTestsuiteError(char *xmlString);
 
 #endif /* UCUNIT_XML_H_ */

@@ -82,7 +82,7 @@ void System_Shutdown(void)
     System_WriteXMLStringToFile(buffer);
 #endif
     printf("System shutdown.\n");
-    exit(0);
+    //exit(0);
 }
 
 /* Stub: Recover your system from a safe state. */
