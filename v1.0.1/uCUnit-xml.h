@@ -125,7 +125,7 @@
 
 /* These values are configurable. Increasing the values might use too much memory which can cause errors.*/
 #define MAX_NUM_OF_TEST_CASES   32
-#define MAX_NUM_OF_CHECKS       32*64
+#define MAX_NUM_OF_CHECKS       MAX_NUM_OF_TEST_CASES*64
 
 /* ----- Structures -------------------------------------------------------- */
 
@@ -135,9 +135,7 @@
 
 typedef enum UCUNIT_ErrorTypes
 {
-    UCUNIT_ErrorTypeNoError = 0,
-    UCUNIT_ErrorTypeTooManyTestCases = 1,
-    UCUNIT_ErrorTypeTooManyChecks = 2
+    UCUNIT_ErrorTypeTooManyTestCases = 0, UCUNIT_ErrorTypeTooManyChecks = 1
 } UCUNIT_ErrorType;
 typedef struct UCUNIT_XmlChecks
 {
@@ -231,8 +229,7 @@ void UCUNIT_XML_TestcaseEnd(bool isPassed);
  * @param [in] arguments Pointer to the check's arguments.
  * @param [in] line The line number of the check where it was executed.
  */
-void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments,
-                              char *line);
+void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments, char *line);
 
 /**
  * Calls all the methods that creates the XML string.
@@ -305,8 +302,7 @@ void UCUNIT_XML_GetTestcases(char *xmlString);
  * @param [in] firstTestcaseCheckIndex The index of the first check from the current testcase.
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex,
-                            uint16_t firstTestcaseCheckIndex);
+void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex, uint16_t firstTestcaseCheckIndex);
 
 /**
  * Converts a test check into an XML string.
@@ -317,8 +313,7 @@ void UCUNIT_XML_GetTestcase(char *xmlString, uint16_t testcaseIndex,
  * @param [in] j The index of the current check.
  * @param [out] xmlString Pointer to the output string array.
  */
-void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
-                         const char *result);
+void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex, const char *result);
 
 /**
  * Calculates the size of the char array which contains the XML string beforehand.

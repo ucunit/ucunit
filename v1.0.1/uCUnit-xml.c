@@ -180,15 +180,16 @@ static void getTestsuiteError(char *xmlString)
 
     strcat(xmlString, "\t<error>\n");
 
-    if (staticTestSuite.numOfChecks == MAX_NUM_OF_CHECKS)
+    switch (staticTestSuite.errorType)
     {
-        sprintf(tempBuffer, "\t\tToo many checks.The allowed amount of checks is %d\n",
-        MAX_NUM_OF_CHECKS);
-    }
-    if (staticTestSuite.numOfTestCases == MAX_NUM_OF_TEST_CASES)
-    {
-        sprintf(tempBuffer, "\t\tToo many testcases.The allowed amount of testcases is %d\n",
-        MAX_NUM_OF_TEST_CASES);
+        case UCUNIT_ErrorTypeTooManyTestCases:
+            sprintf(tempBuffer, "\t\tToo many testcases.The allowed amount of testcases is %d\n",
+            MAX_NUM_OF_TEST_CASES);
+            break;
+
+        case UCUNIT_ErrorTypeTooManyChecks:
+            sprintf(tempBuffer, "\t\tToo many checks.The allowed amount of checks is %d\n",
+            MAX_NUM_OF_CHECKS);
     }
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
     strcat(xmlString, "\t</error>\n");
@@ -213,6 +214,7 @@ void UCUNIT_XML_TestcaseBegin(char *testCaseName)
     if (staticTestSuite.numOfTestCases == MAX_NUM_OF_TEST_CASES)
     {
         staticTestSuite.errorFlag = true;
+        staticTestSuite.errorType = UCUNIT_ErrorTypeTooManyTestCases;
         return;
     }
     UCUNIT_XmlTestCase testcase;
@@ -247,6 +249,7 @@ void UCUNIT_XML_CheckExecuted(bool isPassed, char *type, char *arguments, char *
     if (staticTestSuite.numOfChecks == MAX_NUM_OF_CHECKS)
     {
         staticTestSuite.errorFlag = true;
+        staticTestSuite.errorType = UCUNIT_ErrorTypeTooManyChecks;
         return;
     }
     UCUNIT_XmlCheck check;
@@ -326,8 +329,11 @@ void UCUNIT_XML_GetTestcases(char *xmlString)
     uint16_t firstTestcaseCheckIndex = 0u;
     for (testcaseIndex = 0u; testcaseIndex < staticTestSuite.numOfTestCases; ++testcaseIndex)
     {
-        UCUNIT_XML_GetTestcase(xmlString, testcaseIndex, firstTestcaseCheckIndex);
-        firstTestcaseCheckIndex = (uint16_t) (testcases[testcaseIndex].numberOfChecks + firstTestcaseCheckIndex);
+        if (testcases[testcaseIndex].numberOfChecks != 0)
+        {
+            UCUNIT_XML_GetTestcase(xmlString, testcaseIndex, firstTestcaseCheckIndex);
+            firstTestcaseCheckIndex = (uint16_t) (testcases[testcaseIndex].numberOfChecks + firstTestcaseCheckIndex);
+        }
     }
 }
 
