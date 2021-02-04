@@ -322,4 +322,11 @@ void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex, const char *resul
  */
 void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize);
 
+/**
+ * Returns the result of the test suite:
+ * False, if there's any error or failed test case, otherwise true
+ *
+ */
+bool UCUNIT_XML_IsTestSuiteResultPassed(void);
+
 #endif /* UCUNIT_XML_H_ */

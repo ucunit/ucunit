@@ -390,6 +390,15 @@ void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex, const char *resul
     strncat(xmlString, tempBuffer, strlen(tempBuffer));
 }
 
+bool UCUNIT_XML_IsTestSuiteResultPassed(void)
+{
+    if ((ucunit_testcases_failed != 0) || staticTestSuite.errorFlag)
+    {
+        return false;
+    }
+    return true;
+}
+
 #else
 void UCUNIT_XML_TestBegin(char* testSuiteName,  char *file)
 {
