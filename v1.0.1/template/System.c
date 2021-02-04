@@ -7,7 +7,7 @@
  *                                                                           *
  *  File        : System.c                                                   *
  *  Description : System dependent functions used by uCUnit.                 *
- *                This file has to be customized for your hardware.         *
+ *                This file has to be customized for your hardware.          *
  *  Author      : Sven Stefan Krauss                                         *
  *  Contact     : www.ucunit.org                                             *
  *                                                                           *

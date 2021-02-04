@@ -27,14 +27,14 @@ TARGET:=Testsuite
 
 # Sourcefiles
 SRCS:=           \
-./Testsuite.c   \
-./uCUnit-xml.c	\
+../Testsuite.c   \
+../uCUnit-xml.c	\
 
 # Objectfiles
 OBJS:=           \
-./template/System.o     \
-./Testsuite.o \
-./uCUnit-xml.o	\
+../template/System.o     \
+../Testsuite.o \
+../uCUnit-xml.o	\
 
 # Dependencies
 
@@ -68,9 +68,9 @@ $(TARGET):	$(OBJS)
 #----------------------------------------------------
 clean:
 	echo 'Running clean...'
-	$(RM) ./$(TARGET)
-	$(RM) ./**/*.o core
-	$(RM) ./*.o core
-	$(RM) ./*.xml core
+	$(RM) $(TARGET)
+	$(RM) ../**/*.o core
+	$(RM) ../*.o core
+	$(RM) *.xml core
 	echo 'Clean finished.'
 	
