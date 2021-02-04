@@ -400,6 +400,12 @@ bool UCUNIT_XML_IsTestSuiteResultPassed(void)
 }
 
 #else
+
+void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize)
+{
+    UNUSED(bufferSize);
+}
+
 void UCUNIT_XML_TestBegin(char* testSuiteName,  char *file)
 {
     UNUSED(testSuiteName);
@@ -464,20 +470,9 @@ void UCUNIT_XML_GetCheck(char *xmlString, uint16_t checkIndex,
     UNUSED(result);
 }
 
-void UCUNIT_XML_GetTestsuiteSystemErr(char *xmlString)
+bool UCUNIT_XML_IsTestSuiteResultPassed(void)
 {
-    UNUSED(xmlString);
-}
-
-void UCUNIT_XML_GetSizeOfTestsuite(size_t *bufferSize)
-{
-    UNUSED(bufferSize);
-}
-
-char* UCUNIT_XML_GetTestFileName(void)
-{
-    char *ret = 0;
-    return ret;
+    return false;
 }
 
 #endif
