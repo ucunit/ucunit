@@ -4,11 +4,13 @@
  *                                                                           *
  *  (C) 2007 - 2008 Sven Stefan Krauss                                       *
  *                  https://www.ucunit.org                                   *
+ *  (C) 2020 - 2021 Balint Huszar - IncQuery Labs cPlc.                      *
+ *  (C) 2020 - 2021 Zoltan Selmeczi - IncQuery Labs cPlc.                    *
  *                                                                           *
  *  File        : System.c                                                   *
  *  Description : System dependent functions used by uCUnit.                 *
  *                This file has to be customized for your hardware.          *
- *  Author      : Sven Stefan Krauss                                         *
+ *  Author      : Sven Stefan Krauss, Zoltan Selmeczi, Balint Huszar         *
  *  Contact     : www.ucunit.org                                             *
  *                                                                           *
  *****************************************************************************/
