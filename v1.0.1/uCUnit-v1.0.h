@@ -171,7 +171,6 @@
 /*****************************************************************************/
 
 #define UCUNIT_VERSION "v1.1" /* Version info */
-#define UCUNIT_MODE_XML 1 /* Only for debugging! */
 
 #ifndef NULL
 #define NULL (void *)0
