@@ -28,11 +28,12 @@ TARGET:=Testsuite
 # Sourcefiles
 SRCS:=           \
 ../Testsuite.c   \
+./System.c 	    \
 ../uCUnit-xml.c	\
 
 # Objectfiles
 OBJS:=           \
-../template/System.o     \
+./System.o     \
 ../Testsuite.o \
 ../uCUnit-xml.o	\
 
