@@ -38,7 +38,7 @@
 #ifndef UCUNIT_0101_H_
 #define UCUNIT_0101_H_
 
-#include <System.h>
+#include "System.h"
 
 /*****************************************************************************/
 /****** Customizing area ******/
@@ -152,6 +152,7 @@
  * UCUNIT_MODE_NORMAL: Only checks that fail are displayes
  * UCUNIT_MODE_VERBOSE: Passed and failed checks are displayed
  * UCUNIT_MODE_JSON: Report is generated in json format
+ * UCUNIT_MODE_XML: Report is generated in xml format
  */
 /* Mode is controlled via CMAKE option */
 
@@ -195,16 +196,15 @@
 /*****************************************************************************/
 
 /* Variables for simple statistics */
-static int ucunit_checks_failed = 0; /* Numer of failed checks */
-static int ucunit_checks_passed = 0; /* Number of passed checks */
-
-static int ucunit_testcases_failed = 0; /* Number of failed test cases */
-static int ucunit_testcases_passed = 0; /* Number of passed test cases */
-static int ucunit_testcases_failed_checks = 0; /* Number of failed checks in a testcase */
-static int ucunit_checklist_failed_checks = 0; /* Number of failed checks in a checklist */
-static int ucunit_action = UCUNIT_ACTION_WARNING; /* Action to take if a check fails */
-static int ucunit_checkpoints[UCUNIT_MAX_TRACEPOINTS]; /* Max. number of tracepoints */
-static int ucunit_index = 0; /* Tracepoint index */
+extern int ucunit_checks_failed; /* Numer of failed checks */
+extern int ucunit_checks_passed; /* Number of passed checks */
+extern int ucunit_testcases_failed; /* Number of failed test cases */
+extern int ucunit_testcases_passed; /* Number of passed test cases */
+extern int ucunit_testcases_failed_checks; /* Number of failed checks in a testcase */
+extern int ucunit_checklist_failed_checks; /* Number of failed checks in a checklist */
+extern int ucunit_action; /* Action to take if a check fails */
+extern int ucunit_checkpoints[UCUNIT_MAX_TRACEPOINTS]; /* Max. number of tracepoints */
+extern int ucunit_index; /* Tracepoint index */
 
 /*****************************************************************************/
 /* Internal (private) Macros                                                 */
@@ -560,6 +560,8 @@ static int ucunit_index = 0; /* Tracepoint index */
 
 #ifdef UCUNIT_MODE_JSON
 #include "uCUnit-json.h"
+#elif UCUNIT_MODE_XML
+#include "uCUnit-xml.h"
 #else
 #include "uCUnit-hr.h"
 #endif

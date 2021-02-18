@@ -1,0 +1,13 @@
+.cproject
+*.o
+*.exe
+v1.0.1/.project
+jenkins-junit.xsd
+v1.0.1/.settings/language.settings.xml
+*.xml
+.project
+.settings
+.cproject
+.project
+.cproject
+.settings/language.settings.xml

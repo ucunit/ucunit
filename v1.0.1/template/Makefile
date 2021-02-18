@@ -7,7 +7,7 @@
 #----------------------------------------------------
 # Compiler
 CC:=gcc
-CFLAGS:=-g
+CFLAGS:= -std='c99' -g -Wall -Wextra -pedantic -Wconversion
 
 #Linker
 LD:=gcc
@@ -17,23 +17,29 @@ LDFLAGS:=-g
 RUN:=cmd /C
 
 # Clean up
-RM:=del
+RM:=rm -f
 
 #----------------------------------------------------
 # Files
 #----------------------------------------------------
 # Name of target file
-TARGET:=Testsuite.exe
+TARGET:=Testsuite
 
 # Sourcefiles
 SRCS:=           \
-./System.c       \
 ../Testsuite.c   \
+./System.c 	    \
+../uCUnit-xml.c	\
 
 # Objectfiles
 OBJS:=           \
-./System.obj     \
-../Testsuite.obj \
+./System.o     \
+../Testsuite.o \
+../uCUnit-xml.o	\
+
+# Dependencies
+
+DEPS:=			\
 
 #----------------------------------------------------
 # Build all
@@ -49,14 +55,14 @@ run: $(TARGET)
 #----------------------------------------------------
 $(TARGET):	$(OBJS)
 	echo 'Linking...'
-	$(LD) $(LDFLAGS) -o $(notdir $@) $(notdir $(OBJS))
+	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 #----------------------------------------------------
 # Compiler
 #----------------------------------------------------
 %.obj: %.c
 	echo 'Compiling...'
-	$(CC) $(CFLAGS) -o $(notdir $@) -c $<
+	$(CC) -o $(notdir $@) -c $< $(CFLAGS)
 	
 #----------------------------------------------------
 # Clean Project
@@ -64,7 +70,8 @@ $(TARGET):	$(OBJS)
 clean:
 	echo 'Running clean...'
 	$(RM) $(TARGET)
-	$(RM) System.obj
-	$(RM) Testsuite.obj
+	$(RM) ../**/*.o core
+	$(RM) ../*.o core
+	$(RM) *.xml core
 	echo 'Clean finished.'
 	
